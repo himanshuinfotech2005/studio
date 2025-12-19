@@ -1,7 +1,7 @@
 "use client";
 
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { auth } from "@/lib/firebase-client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -10,11 +10,13 @@ export default function AdminLogin() {
   const [password, setPassword] = useState("");
   const router = useRouter();
 
-  const login = async () => {
+  const login = async (email,password) => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      console.log("email, password",);
+      const fun =  await signInWithEmailAndPassword(auth, email, password);
       router.push("/admin/dashboard");
     } catch (err) {
+      console.log("Login error", err);
       alert("Invalid credentials");
     }
   };
@@ -43,7 +45,7 @@ export default function AdminLogin() {
         />
 
         <button
-          onClick={login}
+          onClick={()=>login(email, password)}
           className="w-full bg-black text-white py-3 text-sm tracking-wide"
         >
           LOGIN
