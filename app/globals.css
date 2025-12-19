@@ -1,26 +1,40 @@
 @import "tailwindcss";
 
+
+/* ===== DESIGN TOKENS (FROM SCREENSHOTS) ===== */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg-primary: #F3EDE3;     /* beige background */
+  --text-primary: #1A1A1A;  /* dark text */
+  --text-muted: #6B6B6B;
+  --gold: #B89B5E;          /* button / accent */
+  --line: #D8CFC0;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ===== TAILWIND v4 THEME MAPPING (MOST IMPORTANT) ===== */
+@theme {
+  --color-bg: var(--bg-primary);
+  --color-text: var(--text-primary);
+  --color-muted: var(--text-muted);
+  --color-gold: var(--gold);
+  --color-line: var(--line);
+
+  --font-serif: IvorySerif, serif;
+  --font-sans: IvorySans, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ===== FONTS ===== */
+@font-face {
+  font-family: "IvorySerif";
+  src: url("/fonts/PlayfairDisplay-Regular.ttf");
+}
+
+@font-face {
+  font-family: "IvorySans";
+  src: url("/fonts/Inter-Regular.ttf");
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: "IvorySans", sans-serif;
 }
