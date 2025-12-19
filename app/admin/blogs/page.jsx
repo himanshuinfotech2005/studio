@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { LoadingSpinner, BackButton } from "../components/AdminUI";
 
 export default function AdminBlogsList() {
   const [blogs, setBlogs] = useState([]);
@@ -24,10 +25,12 @@ export default function AdminBlogsList() {
     fetchBlogs();
   }, []);
 
-  if (loading) return <div className="p-16">Loading...</div>;
+  if (loading) return <LoadingSpinner />;
 
   return (
     <main className="p-16 w-full">
+      <BackButton href="/admin/dashboard" />
+
       <div className="flex justify-between items-center mb-10">
         <h1 className="font-serif text-4xl">Blogs</h1>
         <Link
