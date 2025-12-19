@@ -1,124 +1,95 @@
 "use client";
 
-import { useState } from "react";
-import { db, storage } from "@/lib/firebase";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { collection, getDocs, orderBy, query } from "firebase/firestore";
+import { db } from "@/lib/firebase-client"; // Ensure you have db exported from here
 
-export default function AdminPhotographyPage() {
-  const [title, setTitle] = useState("");
-  const [location, setLocation] = useState("");
-  const [description, setDescription] = useState("");
-  const [image, setImage] = useState(null);
-  const [published, setPublished] = useState(false);
-  const [loading, setLoading] = useState(false);
+export default function AdminPhotographyList() {
+  const [photos, setPhotos] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleUpload = async () => {
-    if (!image || !title) {
-      alert("Title and image are required");
-      return;
-    }
+  useEffect(() => {
+    const fetchPhotos = async () => {
+      try {
+        const q = query(collection(db, "photography"), orderBy("createdAt", "desc"));
+        const querySnapshot = await getDocs(q);
+        const data = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setPhotos(data);
+      } catch (error) {
+        console.error("Error fetching photography:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    setLoading(true);
+    fetchPhotos();
+  }, []);
 
-    try {
-      /* 1️⃣ Upload image to Firebase Storage */
-      const imageRef = ref(
-        storage,
-        `photography/${Date.now()}-${image.name}`
-      );
-      await uploadBytes(imageRef, image);
-
-      const imageURL = await getDownloadURL(imageRef);
-
-      /* 2️⃣ Save data to Firestore */
-      await addDoc(collection(db, "photography"), {
-        title,
-        location,
-        description,
-        coverImage: imageURL,
-        published,
-        createdAt: serverTimestamp(),
-      });
-
-      alert("Photography added successfully");
-
-      /* Reset form */
-      setTitle("");
-      setLocation("");
-      setDescription("");
-      setImage(null);
-      setPublished(false);
-
-    } catch (error) {
-      console.error(error);
-      alert("Upload failed");
-    }
-
-    setLoading(false);
-  };
+  if (loading) return <div className="p-16">Loading...</div>;
 
   return (
-    <main className="p-16 max-w-4xl">
-
-      <h1 className="font-serif text-4xl mb-10">
-        Add Photography
-      </h1>
-
-      {/* TITLE */}
-      <input
-        type="text"
-        placeholder="Title"
-        className="w-full border-b py-3 mb-6 focus:outline-none"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
-
-      {/* LOCATION */}
-      <input
-        type="text"
-        placeholder="Location"
-        className="w-full border-b py-3 mb-6 focus:outline-none"
-        value={location}
-        onChange={(e) => setLocation(e.target.value)}
-      />
-
-      {/* DESCRIPTION */}
-      <textarea
-        placeholder="Description"
-        rows="4"
-        className="w-full border-b py-3 mb-6 focus:outline-none resize-none"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-      />
-
-      {/* IMAGE */}
-      <input
-        type="file"
-        accept="image/*"
-        className="mb-6"
-        onChange={(e) => setImage(e.target.files[0])}
-      />
-
-      {/* PUBLISH */}
-      <div className="flex items-center gap-3 mb-10">
-        <input
-          type="checkbox"
-          checked={published}
-          onChange={() => setPublished(!published)}
-        />
-        <label>Publish on website</label>
+    <main className="p-16 w-full">
+      <div className="flex justify-between items-center mb-10">
+        <h1 className="font-serif text-4xl">Photography</h1>
+        <Link
+          href="/admin/photography/new"
+          className="bg-black text-white px-6 py-3 text-sm tracking-wide hover:bg-gray-800 transition"
+        >
+          + ADD NEW
+        </Link>
       </div>
 
-      {/* SUBMIT */}
-      <button
-        onClick={handleUpload}
-        disabled={loading}
-        className="bg-black text-white px-10 py-3 text-sm tracking-wide"
-      >
-        {loading ? "UPLOADING..." : "SAVE PHOTOGRAPHY"}
-      </button>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {photos.map((photo) => (
+          <div key={photo.id} className="border p-4 bg-white shadow-sm">
+            <div className="relative h-48 w-full mb-4 bg-gray-100 overflow-hidden">
+              {photo.coverImage ? (
+                <img
+                  src={photo.coverImage}
+                  alt={photo.title}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-400">
+                  No Image
+                </div>
+              )}
+            </div>
+            
+            <h2 className="font-serif text-xl mb-1 truncate">{photo.title}</h2>
+            <p className="text-xs text-gray-500 uppercase tracking-wide mb-3">
+              {photo.location || "No Location"}
+            </p>
+            
+            <div className="flex justify-between items-center mt-4 border-t pt-4">
+              <span
+                className={`text-xs px-2 py-1 rounded ${
+                  photo.published
+                    ? "bg-green-100 text-green-800"
+                    : "bg-yellow-100 text-yellow-800"
+                }`}
+              >
+                {photo.published ? "Published" : "Draft"}
+              </span>
+              
+              {/* You can add Edit/Delete buttons here later */}
+              <button className="text-xs text-gray-500 hover:text-black underline">
+                Edit
+              </button>
+            </div>
+          </div>
+        ))}
 
+        {photos.length === 0 && (
+          <div className="col-span-full text-center py-20 text-gray-400">
+            No photography entries found.
+          </div>
+        )}
+      </div>
     </main>
   );
 }
