@@ -1,9 +1,97 @@
+"use client";
+
+import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
 
 export default function BlogsPage() {
+  const [blogs, setBlogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [lastId, setLastId] = useState(null);
+  const [hasMore, setHasMore] = useState(true);
+  
+  const observerTarget = useRef(null);
+
+  // --- Fetch Logic ---
+  const fetchBlogs = useCallback(async (isInitial = false) => {
+    if (!hasMore && !isInitial) return;
+
+    try {
+      if (isInitial) setLoading(true);
+      else setLoadingMore(true);
+
+      // Fetch 7 items initially (1 featured + 6 grid), then 6 for subsequent loads
+      const limit = isInitial ? "7" : "6";
+      const params = new URLSearchParams({ limit });
+      if (!isInitial && lastId) params.append("lastId", lastId);
+
+      const res = await fetch(`/api/blogs?${params.toString()}`, { cache: "no-store" });
+      if (!res.ok) throw new Error("Failed to fetch");
+      
+      const data = await res.json();
+
+      if (isInitial) {
+        setBlogs(data.items);
+      } else {
+        setBlogs(prev => [...prev, ...data.items]);
+      }
+
+      setLastId(data.lastId);
+      setHasMore(data.hasMore);
+
+    } catch (error) {
+      console.error("Error fetching blogs:", error);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  }, [lastId, hasMore]);
+
+  // Initial Load
+  useEffect(() => {
+    fetchBlogs(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Infinite Scroll Observer
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && hasMore && !loading && !loadingMore) {
+          fetchBlogs(false);
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
+    }
+
+    return () => {
+      if (observerTarget.current) {
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        observer.unobserve(observerTarget.current);
+      }
+    };
+  }, [hasMore, loading, loadingMore, fetchBlogs]);
+
+  // --- Derived State ---
+  const featuredBlog = blogs.length > 0 ? blogs[0] : null;
+  const blogList = blogs.length > 1 ? blogs.slice(1) : [];
+
+  // Helper for Date Formatting
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    return new Date(dateString).toLocaleDateString('en-GB', {
+      day: 'numeric', month: 'short', year: 'numeric'
+    });
+  };
+
   return (
-    <main className="bg-[#F3ECE2]">
+    <main className="bg-[#F3ECE2] min-h-screen">
       <Navbar />
 
       {/* ================= INTRO ================= */}
@@ -17,125 +105,120 @@ export default function BlogsPage() {
         </p>
       </section>
 
-      {/* ================= FEATURED BLOG ================= */}
-      <section className="px-6 md:px-28 pb-32">
-
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-24 items-center">
-
-    {/* IMAGE — MUCH BIGGER */}
-    <div className="relative w-full aspect-[18/10] overflow-hidden">
-      <Image
-        src="/images/blogs/featured.jpg"
-        alt="Featured Blog"
-        fill
-        className="object-cover"
-        priority
-      />
-    </div>
-
-    {/* TEXT — BIGGER & AIRY */}
-    <div className="max-w-lg">
-
-      <p className="text-xs tracking-widest text-muted mb-4 uppercase">
-        10 Aug, 2025
-      </p>
-
-      <h2 className="font-serif text-[48px] leading-[1.15] mb-6">
-        The Ivory Experience Luxury Wedding Photography in India
-      </h2>
-
-      <p className="text-[15px] text-muted leading-7 mb-7">
-        At Ivory Films, we believe your wedding story is more than a
-        timeline of events — it’s a tapestry of emotions, traditions,
-        and fleeting moments that deserve to be preserved with heart
-        and artistry.
-      </p>
-
-      <a
-        href="/blogs/the-ivory-experience"
-        className="text-sm font-medium hover:text-gold transition-colors"
-      >
-        READ MORE →
-      </a>
-    </div>
-
-  </div>
-
-</section>
-
-      {/* ================= BLOG LIST ================= */}
-      <section className="px-6 md:px-24 pb-32">
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
-
-          {blogs.map((blog, index) => (
-            <div key={index} className="flex flex-col">
-
-              {/* IMAGE */}
-              <div className="relative w-full aspect-[4/3] mb-4 overflow-hidden">
-                <Image
-                  src={blog.image}
-                  alt={blog.title}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-
-              <p className="text-xs text-muted mb-2 uppercase">
-                {blog.date}
-              </p>
-
-              <h3 className="font-serif text-xl leading-snug mb-3">
-                {blog.title}
-              </h3>
-
-              <p className="text-sm text-muted leading-6 mb-4">
-                {blog.excerpt}
-              </p>
-
-              <a
-                href={`/blogs/${blog.slug}`}
-                className="text-sm font-medium hover:text-gold transition-colors mt-auto"
-              >
-                READ MORE →
-              </a>
-
-            </div>
-          ))}
-
+      {loading ? (
+        <div className="flex justify-center py-32">
+          <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-black"></div>
         </div>
+      ) : (
+        <>
+          {/* ================= FEATURED BLOG ================= */}
+          {featuredBlog && (
+            <section className="px-6 md:px-28 pb-32">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24 items-center">
+                
+                {/* IMAGE */}
+                <Link href={`/blogs/${featuredBlog.id}`} className="relative w-full aspect-[16/10] overflow-hidden group block">
+                  {featuredBlog.images && featuredBlog.images.length > 0 ? (
+                    <Image
+                      src={featuredBlog.images[0]}
+                      alt={featuredBlog.title}
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      priority
+                      unoptimized
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">No Image</div>
+                  )}
+                </Link>
 
-      </section>
+                {/* TEXT */}
+                <div className="max-w-lg">
+                  <p className="text-xs tracking-widest text-gray-500 mb-4 uppercase">
+                    {formatDate(featuredBlog.createdAt)}
+                  </p>
 
+                  <h2 className="font-serif text-3xl md:text-[40px] leading-[1.15] mb-6">
+                    <Link href={`/blogs/${featuredBlog.id}`} className="hover:underline decoration-1 underline-offset-4">
+                      {featuredBlog.title}
+                    </Link>
+                  </h2>
+
+                  <p className="text-[15px] text-gray-600 leading-7 mb-7 line-clamp-3">
+                    {featuredBlog.shortDescription}
+                  </p>
+
+                  <Link
+                    href={`/blogs/${featuredBlog.id}`}
+                    className="text-sm font-medium hover:text-gray-600 transition-colors"
+                  >
+                    READ MORE →
+                  </Link>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* ================= BLOG LIST ================= */}
+          <section className="px-6 md:px-24 pb-32">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-10 gap-y-16">
+              {blogList.map((blog) => (
+                <div key={blog.id} className="flex flex-col group">
+                  
+                  {/* IMAGE */}
+                  <Link href={`/blogs/${blog.id}`} className="relative w-full aspect-[4/3] mb-6 overflow-hidden bg-gray-200 block">
+                    {blog.images && blog.images.length > 0 ? (
+                      <Image
+                        src={blog.images[0]}
+                        alt={blog.title}
+                        fill
+                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-full text-gray-400">No Image</div>
+                    )}
+                  </Link>
+
+                  <p className="text-xs text-gray-500 mb-2 uppercase">
+                    {formatDate(blog.createdAt)}
+                  </p>
+
+                  <h3 className="font-serif text-xl leading-snug mb-3 group-hover:underline decoration-1 underline-offset-4">
+                    <Link href={`/blogs/${blog.id}`}>
+                      {blog.title}
+                    </Link>
+                  </h3>
+
+                  <p className="text-sm text-gray-600 leading-6 mb-4 line-clamp-3">
+                    {blog.shortDescription}
+                  </p>
+
+                  <Link
+                    href={`/blogs/${blog.id}`}
+                    className="text-sm font-medium hover:text-gray-600 transition-colors mt-auto inline-block"
+                  >
+                    READ MORE →
+                  </Link>
+                </div>
+              ))}
+            </div>
+
+            {/* Loading Trigger */}
+            <div ref={observerTarget} className="h-10 w-full flex justify-center items-center mt-12">
+              {loadingMore && (
+                <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-gray-400"></div>
+              )}
+            </div>
+
+            {!hasMore && blogList.length > 0 && (
+              <div className="text-center text-gray-400 text-sm mt-12">
+                End of list
+              </div>
+            )}
+          </section>
+        </>
+      )}
     </main>
   );
 }
-
-/* ================= DATA ================= */
-
-const blogs = [
-  {
-    title: "A Sunset Wedding Ceremony by the Sea",
-    slug: "sunset-wedding-ceremony-sea",
-    date: "28 Jul, 2024",
-    image: "/images/blogs/1.jpg",
-    excerpt:
-      "An intimate seaside wedding with golden-hour vows and breathtaking views."
-  },
-  {
-    title: "Inside a Traditional Gujarati Wedding",
-    slug: "traditional-gujarati-wedding",
-    date: "14 Jun, 2024",
-    image: "/images/blogs/2.jpg",
-    excerpt:
-      "Exploring rituals, colors, and emotions of a beautiful Gujarati wedding."
-  },
-  {
-    title: "How We Craft Cinematic Wedding Films",
-    slug: "crafting-cinematic-wedding-films",
-    date: "02 May, 2024",
-    image: "/images/blogs/3.jpg",
-    excerpt:
-      "A behind-the-scenes look at our filmmaking process and storytelling approach."
-  }
-];

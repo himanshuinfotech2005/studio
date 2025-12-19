@@ -1,11 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { LoadingSpinner, BackButton } from "../components/AdminUI";
 
 export default function AdminEditorialPage() {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  
+  // Pagination State
+  const [lastId, setLastId] = useState(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   
   // Modal State
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -13,18 +19,34 @@ export default function AdminEditorialPage() {
 
   // Fetch Images
   useEffect(() => {
-    fetchImages();
+    fetchImages(true);
   }, []);
 
-  const fetchImages = async () => {
+  const fetchImages = async (isInitial = false) => {
     try {
-      const res = await fetch("/api/editorial", { cache: "no-store" });
+      if (isInitial) setLoading(true);
+      else setLoadingMore(true);
+
+      // Use a higher limit for admin view (e.g., 20)
+      const params = new URLSearchParams({ limit: "20" });
+      if (!isInitial && lastId) params.append("lastId", lastId);
+
+      const res = await fetch(`/api/editorial?${params.toString()}`, { cache: "no-store" });
       const data = await res.json();
-      setImages(data);
+      
+      if (isInitial) {
+        setImages(data.items);
+      } else {
+        setImages(prev => [...prev, ...data.items]);
+      }
+      
+      setLastId(data.lastId);
+      setHasMore(data.hasMore);
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   };
 
@@ -59,8 +81,8 @@ export default function AdminEditorialPage() {
 
       if (!dbRes.ok) throw new Error("DB Save failed");
 
-      // 3. Refresh List
-      fetchImages();
+      // 3. Refresh List (Reset to initial state to see new image at top)
+      fetchImages(true);
     } catch (error) {
       alert(error.message);
     } finally {
@@ -93,6 +115,8 @@ export default function AdminEditorialPage() {
 
   return (
     <main className="p-16 w-full relative min-h-screen">
+       <BackButton href="/admin/dashboard" />
+
        {/* Header */}
        <div className="flex justify-between items-center mb-10">
         <h1 className="font-serif text-4xl">Editorial Gallery</h1>
@@ -110,31 +134,46 @@ export default function AdminEditorialPage() {
 
       {/* Grid */}
       {loading ? (
-        <div>Loading...</div>
+        <LoadingSpinner />
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {images.map(img => (
-            <div key={img.id} className="relative group aspect-3/4 bg-gray-100">
-              <img src={img.imageUrl} alt="Editorial" className="w-full h-full object-cover" />
-              
-              {/* Hover Overlay */}
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
-                <button 
-                  onClick={() => confirmDelete(img)}
-                  className="bg-white text-red-600 px-4 py-2 text-xs font-bold uppercase tracking-wider shadow-lg hover:bg-red-50"
-                >
-                  Delete
-                </button>
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-10">
+            {images.map(img => (
+              <div key={img.id} className="relative group aspect-[3/4] bg-gray-100">
+                <img src={img.imageUrl} alt="Editorial" className="w-full h-full object-cover" />
+                
+                {/* Hover Overlay */}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
+                  <button 
+                    onClick={() => confirmDelete(img)}
+                    className="bg-white text-red-600 px-4 py-2 text-xs font-bold uppercase tracking-wider shadow-lg hover:bg-red-50"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
-          
-          {images.length === 0 && (
-            <div className="col-span-full text-center py-20 text-gray-400">
-              No editorial images found.
+            ))}
+            
+            {images.length === 0 && (
+              <div className="col-span-full text-center py-20 text-gray-400">
+                No editorial images found.
+              </div>
+            )}
+          </div>
+
+          {/* Load More Button */}
+          {hasMore && (
+            <div className="flex justify-center pb-10">
+              <button
+                onClick={() => fetchImages(false)}
+                disabled={loadingMore}
+                className="px-6 py-2 border border-gray-300 text-sm hover:bg-gray-50 disabled:opacity-50"
+              >
+                {loadingMore ? "Loading..." : "Load More"}
+              </button>
             </div>
           )}
-        </div>
+        </>
       )}
 
       {/* Delete Confirmation Modal */}
@@ -154,7 +193,7 @@ export default function AdminEditorialPage() {
               </button>
               <button 
                 onClick={handleDelete}
-                className="px-6 py-2 bg-red-600 text-white text-sm font-semibold rounded-md shadow-md hover:bg-red-700 transition"
+                className="px-6 py-2 bg-red-600 text-white text-sm hover:bg-red-700 transition"
               >
                 DELETE IMAGE
               </button>

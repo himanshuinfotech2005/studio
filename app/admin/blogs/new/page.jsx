@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { BackButton } from "../../components/AdminUI";
 
 export default function AdminNewBlogPage() {
   const router = useRouter();
@@ -104,6 +105,7 @@ export default function AdminNewBlogPage() {
 
   return (
     <main className="p-16 max-w-4xl">
+      <BackButton />
       <h1 className="font-serif text-4xl mb-10">Add New Blog</h1>
 
       {/* Basic Info */}

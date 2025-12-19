@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { LoadingSpinner, BackButton } from "../../components/AdminUI";
 
 export default function AdminEditBlogPage() {
   const { id } = useParams();
@@ -119,10 +120,12 @@ export default function AdminEditBlogPage() {
     }
   };
 
-  if (loading) return <div className="p-16">Loading...</div>;
+  if (loading) return <LoadingSpinner />;
 
   return (
     <main className="p-16 max-w-4xl">
+      <BackButton />
+      
       <div className="flex justify-between items-center mb-10">
         <h1 className="font-serif text-4xl">Edit Blog</h1>
         <button onClick={handleDelete} className="text-red-600 text-sm hover:underline">Delete Entry</button>
@@ -232,8 +235,8 @@ export default function AdminEditBlogPage() {
         <button onClick={handleUpdate} disabled={saving} className="bg-black text-white px-10 py-3 text-sm tracking-wide disabled:opacity-50">
           {saving ? "SAVING..." : "UPDATE"}
         </button>
-        <button onClick={() => router.back()} className="px-6 py-3 text-sm tracking-wide border rounded hover:bg-gray-50">
-          Cancel
+        <button onClick={() => router.back()} className="px-6 py-3 text-sm tracking-wide border hover:bg-gray-50">
+          CANCEL
         </button>
       </div>
     </main>
