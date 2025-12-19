@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { LoadingSpinner, BackButton } from "../../components/AdminUI";
 
 export default function AdminPhotographyEditPage() {
   const { id } = useParams();
@@ -11,13 +12,13 @@ export default function AdminPhotographyEditPage() {
   const [location, setLocation] = useState("");
   const [description, setDescription] = useState("");
   
-  // Store image data. For existing images, deleteUrl will be undefined.
-  const [imageData, setImageData] = useState(null); 
+  // Store array of image objects: [{ url, deleteUrl, thumb }, ...]
+  const [images, setImages] = useState([]); 
   
   const [published, setPublished] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   // Fetch existing data
   useEffect(() => {
@@ -32,16 +33,16 @@ export default function AdminPhotographyEditPage() {
         setDescription(data.description || "");
         setPublished(data.published || false);
         
-        if (data.coverImage) {
-          setImageData({
-            url: data.coverImage,
-            thumb: data.coverImage,
-            // No deleteUrl for existing images unless we stored it previously
-          });
+        // Handle existing images (which are just URLs)
+        if (data.images && Array.isArray(data.images)) {
+          setImages(data.images.map(url => ({
+            url: url,
+            thumb: url,
+            // No deleteUrl for existing images unless stored separately
+          })));
         }
       } catch (error) {
         console.error(error);
-        alert("Error loading photography details");
         router.push("/admin/photography");
       } finally {
         setLoading(false);
@@ -52,67 +53,61 @@ export default function AdminPhotographyEditPage() {
   }, [id, router]);
 
   const handleImageSelect = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
 
-    setUploadingImage(true);
-    const formData = new FormData();
-    formData.append("image", file);
+    setUploading(true);
 
     try {
-      const res = await fetch(
-        `https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_IMGBB_API_KEY}`,
-        { method: "POST", body: formData }
-      );
-      
-      const data = await res.json();
-      
-      if (data.success) {
-        setImageData({
+      const uploadPromises = files.map(async (file) => {
+        const formData = new FormData();
+        formData.append("image", file);
+
+        const res = await fetch(
+          `https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_IMGBB_API_KEY}`,
+          { method: "POST", body: formData }
+        );
+        
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error?.message || "Upload failed");
+        
+        return {
           url: data.data.url,
           deleteUrl: data.data.delete_url,
           thumb: data.data.thumb?.url || data.data.url
-        });
-      } else {
-        throw new Error(data.error?.message || "Upload failed");
-      }
+        };
+      });
+
+      const newImages = await Promise.all(uploadPromises);
+      setImages((prev) => [...prev, ...newImages]);
+
     } catch (error) {
       console.error("ImgBB Error:", error);
-      alert("Image upload failed: " + error.message);
+      alert("Some images failed to upload: " + error.message);
     } finally {
-      setUploadingImage(false);
+      setUploading(false);
       e.target.value = null;
     }
   };
 
-  const handleRemoveImage = async () => {
-    if (!imageData) return;
+  const handleRemoveImage = (indexToRemove) => {
     if (!confirm("Remove this image?")) return;
+    setImages((prev) => prev.filter((_, i) => i !== indexToRemove));
+  };
 
-    // Only try to delete from ImgBB if we have a deleteUrl (newly uploaded images)
-    if (imageData.deleteUrl) {
-      try {
-        await fetch("/api/delete-imgbb", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ deleteUrl: imageData.deleteUrl }),
-        });
-      } catch (error) {
-        console.error("Delete error:", error);
-      }
-    }
-    
-    setImageData(null);
+  const moveImage = (index, direction) => {
+    const newImages = [...images];
+    const [movedItem] = newImages.splice(index, 1);
+    newImages.splice(index + direction, 0, movedItem);
+    setImages(newImages);
   };
 
   const handleUpdate = async () => {
-    if (!imageData || !title) {
-      alert("Title and image are required");
+    if (images.length === 0 || !title) {
+      alert("Title and at least one image are required");
       return;
     }
-
     setSaving(true);
-
     try {
       const response = await fetch(`/api/photography/${id}`, {
         method: "PUT",
@@ -121,13 +116,11 @@ export default function AdminPhotographyEditPage() {
           title,
           location,
           description,
-          coverImage: imageData.url,
+          images: images.map(img => img.url), // Send array of URLs
           published,
         }),
       });
-
       if (!response.ok) throw new Error("Failed to update");
-
       alert("Updated successfully");
       router.push("/admin/photography");
     } catch (error) {
@@ -139,13 +132,11 @@ export default function AdminPhotographyEditPage() {
   };
 
   const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete this entry? This cannot be undone.")) return;
-    
+    if (!confirm("Are you sure you want to delete this album?")) return;
     setSaving(true);
     try {
       const response = await fetch(`/api/photography/${id}`, { method: "DELETE" });
       if (!response.ok) throw new Error("Failed to delete");
-      
       router.push("/admin/photography");
     } catch (error) {
       alert("Delete failed: " + error.message);
@@ -153,108 +144,162 @@ export default function AdminPhotographyEditPage() {
     }
   };
 
-  if (loading) return <div className="p-16">Loading...</div>;
+  if (loading) return <LoadingSpinner />;
 
   return (
-    <main className="p-16 max-w-4xl">
+    <main className="p-8 md:p-16 max-w-5xl mx-auto">
+      <BackButton href="/admin/photography" />
+      
       <div className="flex justify-between items-center mb-10">
-        <h1 className="font-serif text-4xl">Edit Photography</h1>
+        <h1 className="font-serif text-4xl">Edit Album</h1>
         <button 
           onClick={handleDelete}
-          className="text-red-600 text-sm hover:underline"
+          className="text-red-600 text-sm hover:underline font-medium"
         >
-          Delete Entry
+          DELETE ALBUM
         </button>
       </div>
 
-      {/* TITLE */}
-      <input
-        type="text"
-        placeholder="Title"
-        className="w-full border-b py-3 mb-6 focus:outline-none"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        {/* TITLE */}
+        <div className="space-y-2">
+          <label className="text-sm font-bold text-gray-700">Album Title</label>
+          <input
+            type="text"
+            placeholder="e.g. Riya & Arjun"
+            className="w-full border p-3 rounded focus:outline-black"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+        </div>
 
-      {/* LOCATION */}
-      <input
-        type="text"
-        placeholder="Location"
-        className="w-full border-b py-3 mb-6 focus:outline-none"
-        value={location}
-        onChange={(e) => setLocation(e.target.value)}
-      />
+        {/* LOCATION */}
+        <div className="space-y-2">
+          <label className="text-sm font-bold text-gray-700">Location</label>
+          <input
+            type="text"
+            placeholder="e.g. Udaipur, Rajasthan"
+            className="w-full border p-3 rounded focus:outline-black"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+          />
+        </div>
+      </div>
 
       {/* DESCRIPTION */}
-      <textarea
-        placeholder="Description"
-        rows="4"
-        className="w-full border-b py-3 mb-6 focus:outline-none resize-none"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-      />
+      <div className="space-y-2 mb-8">
+        <label className="text-sm font-bold text-gray-700">Description</label>
+        <textarea
+          placeholder="Tell the story of this album..."
+          rows="4"
+          className="w-full border p-3 rounded focus:outline-black resize-none"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+      </div>
 
       {/* IMAGE UPLOAD SECTION */}
-      <div className="mb-8">
-        <label className="block text-sm text-gray-500 mb-2">Cover Image</label>
+      <div className="mb-10">
+        <label className="block text-sm font-bold text-gray-700 mb-4">
+          Gallery Images ({images.length})
+        </label>
         
-        {!imageData ? (
-          <div className="relative">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-4">
+          {/* Upload Button */}
+          <label className="border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center h-40 cursor-pointer hover:bg-gray-50 transition-colors">
+            <span className="text-3xl text-gray-400 mb-2">+</span>
+            <span className="text-xs text-gray-500 font-medium">
+              {uploading ? "Uploading..." : "Add Images"}
+            </span>
             <input
               type="file"
               accept="image/*"
+              multiple
               onChange={handleImageSelect}
-              disabled={uploadingImage}
-              className="block w-full text-sm text-gray-500
-                file:mr-4 file:py-2 file:px-4
-                file:rounded-full file:border-0
-                file:text-sm file:font-semibold
-                file:bg-gray-100 file:text-gray-700
-                hover:file:bg-gray-200
-              "
+              disabled={uploading}
+              className="hidden"
             />
-            {uploadingImage && <span className="ml-2 text-sm text-gray-400">Uploading...</span>}
-          </div>
-        ) : (
-          <div className="relative inline-block border p-2 rounded bg-gray-50">
-            <img 
-              src={imageData.thumb} 
-              alt="Preview" 
-              className="h-40 w-auto object-cover rounded"
-            />
-            <button
-              onClick={handleRemoveImage}
-              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 shadow-md transition-colors"
-              title="Remove Image"
-            >
-              ✕
-            </button>
-          </div>
-        )}
+          </label>
+
+          {/* Image Previews */}
+          {images.map((img, index) => (
+            <div key={index} className="relative group border rounded-lg overflow-hidden bg-gray-100 h-40">
+              <img 
+                src={img.thumb} 
+                alt={`Upload ${index}`} 
+                className="w-full h-full object-cover"
+              />
+              
+              {/* Overlay Actions */}
+              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                {index > 0 && (
+                  <button 
+                    onClick={() => moveImage(index, -1)}
+                    className="text-white hover:text-gray-200 text-lg px-1"
+                    title="Move Left"
+                  >
+                    ←
+                  </button>
+                )}
+                
+                <button
+                  onClick={() => handleRemoveImage(index)}
+                  className="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600"
+                  title="Remove"
+                >
+                  ✕
+                </button>
+
+                {index < images.length - 1 && (
+                  <button 
+                    onClick={() => moveImage(index, 1)}
+                    className="text-white hover:text-gray-200 text-lg px-1"
+                    title="Move Right"
+                  >
+                    →
+                  </button>
+                )}
+              </div>
+              
+              {/* Index Badge */}
+              <span className="absolute top-1 left-1 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded">
+                {index + 1}
+              </span>
+            </div>
+          ))}
+        </div>
+        <p className="text-xs text-gray-500">
+          * The first image will be used as the cover thumbnail. Drag logic is simulated with arrows.
+        </p>
       </div>
 
       {/* PUBLISH */}
-      <div className="flex items-center gap-3 mb-10">
+      <div className="flex items-center gap-3 mb-10 p-4 bg-gray-50 rounded border">
         <input
           type="checkbox"
+          id="publish"
+          className="w-5 h-5 accent-black"
           checked={published}
           onChange={() => setPublished(!published)}
         />
-        <label>Publish on website</label>
+        <label htmlFor="publish" className="font-medium cursor-pointer">
+          Publish on website
+        </label>
       </div>
 
       {/* SUBMIT */}
       <div className="flex gap-4">
         <button
           onClick={handleUpdate}
-          disabled={saving || uploadingImage || !imageData}
-          className="bg-black text-white px-10 py-3 text-sm tracking-wide disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={saving || uploading}
+          className="bg-black text-white px-10 py-3 text-sm tracking-wide hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed rounded"
         >
-          {saving ? "SAVING..." : "UPDATE"}
+          {saving ? "SAVING..." : "UPDATE ALBUM"}
         </button>
+        
         <button
           onClick={() => router.back()}
-          className="px-6 py-3 text-sm tracking-wide border hover:bg-gray-50"
+          className="px-6 py-3 text-sm border rounded hover:bg-gray-50"
         >
           CANCEL
         </button>

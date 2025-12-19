@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useEffect, useState, useRef, useCallback } from "react";
 import Navbar from "@/components/Navbar";
 
 /* ================= HERO SLIDER IMAGES ================= */
@@ -13,7 +14,17 @@ const heroImages = [
 
 export default function PhotographyPage() {
   const [active, setActive] = useState(0);
+  
+  // Data State
+  const [albums, setAlbums] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [lastId, setLastId] = useState(null);
+  const [hasMore, setHasMore] = useState(true);
+  
+  const observerTarget = useRef(null);
 
+  // Hero Slider Logic
   useEffect(() => {
     const timer = setInterval(() => {
       setActive((prev) => (prev + 1) % heroImages.length);
@@ -21,18 +32,77 @@ export default function PhotographyPage() {
     return () => clearInterval(timer);
   }, []);
 
+  // Fetch Logic
+  const fetchAlbums = useCallback(async (isInitial = false) => {
+    if (!hasMore && !isInitial) return;
+
+    try {
+      if (isInitial) setLoading(true);
+      else setLoadingMore(true);
+
+      const params = new URLSearchParams({ limit: "6" });
+      if (!isInitial && lastId) params.append("lastId", lastId);
+
+      const res = await fetch(`/api/photography?${params.toString()}`, { cache: "no-store" });
+      if (!res.ok) throw new Error("Failed to fetch");
+      
+      const data = await res.json();
+
+      if (isInitial) {
+        setAlbums(data.items);
+      } else {
+        setAlbums(prev => [...prev, ...data.items]);
+      }
+
+      setLastId(data.lastId);
+      setHasMore(data.hasMore);
+
+    } catch (error) {
+      console.error("Error fetching photography:", error);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  }, [lastId, hasMore]);
+
+  // Initial Load
+  useEffect(() => {
+    fetchAlbums(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Infinite Scroll Observer
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && hasMore && !loading && !loadingMore) {
+          fetchAlbums(false);
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
+    }
+
+    return () => {
+      if (observerTarget.current) {
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        observer.unobserve(observerTarget.current);
+      }
+    };
+  }, [hasMore, loading, loadingMore, fetchAlbums]);
+
   return (
-    <main className="bg-[#F3ECE2]">
+    <main className="bg-[#F3ECE2] min-h-screen">
 
       {/* ================= 1. BIG HERO SLIDER ================= */}
       <section className="relative h-screen w-full overflow-hidden">
-
-        {/* NAVBAR OVER HERO */}
         <div className="absolute top-0 left-0 z-50 w-full">
           <Navbar white />
         </div>
 
-        {/* HERO IMAGES */}
         {heroImages.map((src, i) => (
           <div
             key={src}
@@ -50,15 +120,13 @@ export default function PhotographyPage() {
           </div>
         ))}
 
-        {/* DARK OVERLAY */}
         <div className="absolute inset-0 bg-black/20" />
 
-        {/* WHITE DASH INDICATORS */}
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-4 z-10">
           {heroImages.map((_, i) => (
             <span
               key={i}
-              className={`h-[2px] w-10 ${
+              className={`h-[2px] w-10 transition-colors duration-500 ${
                 i === active ? "bg-white" : "bg-white/40"
               }`}
             />
@@ -66,77 +134,71 @@ export default function PhotographyPage() {
         </div>
       </section>
 
-      {/* ================= 2. EDITORIAL CARDS ================= */}
+      {/* ================= 2. ALBUM GRID ================= */}
       <section className="px-6 md:px-16 py-32">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-black"></div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-10 gap-y-20">
+            {albums.map((album) => (
+              <Link href={`/photography/${album.id}`} key={album.id} className="group block">
+                <div className="relative aspect-[3/4] mb-6 overflow-hidden bg-gray-200">
+                  {album.images && album.images.length > 0 ? (
+                    <Image
+                      src={album.images[0]}
+                      alt={album.title}
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      unoptimized
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-gray-400">No Image</div>
+                  )}
+                </div>
 
-          {editorial.map((item, i) => (
-            <div
-              key={i}
-              className="flex flex-col h-full"
-            >
+                {/* TITLE + LOCATION */}
+                <div className="flex justify-between items-baseline mb-3 border-b border-black/10 pb-3">
+                  <h3 className="font-serif text-2xl group-hover:text-gray-600 transition-colors">
+                    {album.title}
+                  </h3>
+                  <span className="text-xs uppercase tracking-widest text-gray-500">
+                    {album.location}
+                  </span>
+                </div>
 
-              {/* IMAGE — SAME SIZE */}
-              <div className="relative w-full aspect-[4/5] mb-6 overflow-hidden">
-                <Image
-                  src={item.image}
-                  alt={item.title}
-                  fill
-                  className="object-cover"
-                />
-              </div>
+                {/* DESCRIPTION */}
+                <p className="text-sm leading-7 text-gray-600 mb-4 line-clamp-3">
+                  {album.description}
+                </p>
 
-              {/* TITLE + LOCATION */}
-              <div className="flex justify-between items-baseline mb-3">
-                <h3 className="font-serif text-xl">
-                  {item.title}
-                </h3>
-                <span className="text-sm text-muted">
-                  {item.place}
+                {/* READ MORE */}
+                <span className="text-xs font-bold tracking-widest uppercase border-b border-transparent group-hover:border-black transition-all">
+                  View Album
                 </span>
-              </div>
+              </Link>
+            ))}
+          </div>
+        )}
 
-              {/* DESCRIPTION */}
-              <p className="text-sm leading-7 text-muted mb-4 flex-grow">
-                {item.desc}
-              </p>
+        {!loading && albums.length === 0 && (
+          <div className="text-center text-gray-400 py-20">No photography albums found.</div>
+        )}
 
-              {/* READ MORE */}
-              <span className="text-sm font-medium mt-auto">
-                READ MORE →
-              </span>
-
-            </div>
-          ))}
-
+        {/* Loading Trigger */}
+        <div ref={observerTarget} className="h-10 w-full flex justify-center items-center mt-12">
+          {loadingMore && (
+             <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-gray-400"></div>
+          )}
         </div>
+        
+        {!hasMore && albums.length > 0 && (
+          <div className="text-center text-gray-500 py-10">
+            <span className="text-sm">You have seen all albums.</span>
+          </div>
+        )}
       </section>
-
     </main>
   );
 }
-
-/* ================= EDITORIAL DATA ================= */
-const editorial = [
-  {
-    title: "Yashvi X Karan",
-    place: "Surat",
-    image: "/images/photography/1.jpg",
-    desc:
-      "Yashvi and Karan’s wedding was a serene and intimate affair, steeped in tradition yet infused with personal touches...",
-  },
-  {
-    title: "Nancy X Nevil",
-    place: "Bali",
-    image: "/images/photography/2.jpg",
-    desc:
-      "Capturing the magic of love against Bali’s stunning backdrop, Nancy & Nevil’s celebration felt effortless and timeless...",
-  },
-  {
-    title: "Sabrina and Ricky",
-    place: "Bali",
-    image: "/images/photography/3.jpg",
-    desc:
-      "Somebody who betters you, somebody who inspires and encourages you in love and in life — that’s sacred...",
-  },
-];
