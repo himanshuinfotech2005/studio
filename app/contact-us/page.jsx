@@ -4,122 +4,101 @@ import Image from "next/image";
 import Navbar from "@/components/Navbar";
 
 export default function ContactUsPage() {
+  const inputClass =
+    "w-full border-b border-black/70 bg-transparent py-3 text-sm text-black placeholder:text-black/60 focus:outline-none focus:border-black";
+
   return (
     <main className="bg-[#F3ECE2]">
 
-      {/* ================= HERO ================= */}
+      {/* ================= HERO (SCROLLABLE) ================= */}
       <section className="relative h-screen w-full overflow-hidden">
-
-        {/* NAVBAR OVER HERO (WHITE) */}
         <div className="absolute top-0 left-0 z-50 w-full">
           <Navbar white />
         </div>
 
-        {/* HERO IMAGE */}
         <Image
           src="/images/contact/hero.jpg"
-          alt="Contact Ivory Films"
+          alt="Contact Somu Films"
           fill
           priority
           className="object-cover"
         />
 
-        {/* DARK OVERLAY */}
         <div className="absolute inset-0 bg-black/30" />
       </section>
 
-      {/* ================= INTRO TEXT ================= */}
-      <section className="max-w-3xl mx-auto text-center py-20 px-6">
-        <p className="text-sm leading-7 text-black">
+      {/* ================= INTRO + DETAILS (SCROLLABLE) ================= */}
+      <section className="max-w-3xl mx-auto text-center py-16 px-6">
+        <p className="text-sm leading-7">
           Please complete the form below and provide as many details as possible
           to help us create an accurate estimate. We aim to respond within 48 hours.
-          If you do not hear from us or if it is an urgent inquiry, please call us
-          at the number below.
         </p>
 
         <p className="text-sm mt-6">
           Please review our{" "}
-          <a href="/faqs" className="underline">
+          <a href="/faqs" className="underline font-semibold text-black transition-colors duration-300 hover:text-gold">
             FAQ
           </a>{" "}
-          section to find answers to some frequently asked questions.
+          section to find answers to common questions.
         </p>
       </section>
 
-      {/* ================= CONTACT DETAILS ================= */}
-      <section className="text-center pb-32 space-y-6">
-        <p className="font-serif text-lg">
-          hello@ivoryfilms.in
-        </p>
-
-        <p className="font-serif text-lg">
-          +91 9737188899
-        </p>
-
-        <p className="font-serif text-lg">
-          Surat · Mumbai · Hyderabad
-        </p>
+      <section className="text-center pb-12 space-y-4">
+        <p className="font-serif text-lg">hello@ivoryfilms.in</p>
+        <p className="font-serif text-lg">+91 9737188899</p>
+        <p className="font-serif text-lg">Surat · Mumbai · Hyderabad</p>
       </section>
 
-      {/* ================= CONTACT FORM ================= */}
-      <section className="max-w-5xl mx-auto px-6 pb-40">
-        <form className="space-y-16">
+      {/* ================= FORM (ONE SCREEN ONLY) ================= */}
+      <section className="min-h-screen flex items-center">
+        <div className="max-w-3xl mx-auto w-full px-6">
 
-          <input
-            type="text"
-            placeholder="Name*"
-            className="w-full border-b border-black bg-transparent py-4 focus:outline-none"
-          />
+          <form className="space-y-10">
 
-          <input
-            type="email"
-            placeholder="Email*"
-            className="w-full border-b border-black bg-transparent py-4 focus:outline-none"
-          />
+            <input type="text" placeholder="Name*" className={inputClass} />
 
-          <input
-            type="text"
-            placeholder="+91 ▾  Whatsapp No.*"
-            className="w-full border-b border-black bg-transparent py-4 focus:outline-none"
-          />
+            <input type="email" placeholder="Email*" className={inputClass} />
 
-          <textarea
-            placeholder="Tell us more about your wedding – event flow, venues.*"
-            rows="4"
-            className="w-full border-b border-black bg-transparent py-4 focus:outline-none resize-none"
-          />
-
-          <input
-            type="text"
-            placeholder="Location of the wedding*"
-            className="w-full border-b border-black bg-transparent py-4 focus:outline-none"
-          />
-
-          {/* DATE + DAYS */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             <input
-              type="date"
-              className="border-b border-black bg-transparent py-4 focus:outline-none"
+              type="text"
+              placeholder="+91 ▾  Whatsapp No.*"
+              className={inputClass}
+            />
+
+            <textarea
+              placeholder="Tell us more about your wedding – event flow, venues.*"
+              rows="3"
+              className={`${inputClass} resize-none`}
             />
 
             <input
-              type="number"
-              placeholder="No. of Days*"
-              className="border-b border-black bg-transparent py-4 focus:outline-none"
+              type="text"
+              placeholder="Location of the wedding*"
+              className={inputClass}
             />
-          </div>
 
-          {/* SUBMIT */}
-          <div className="text-center pt-12">
-            <button
-              type="submit"
-              className="bg-gold text-white px-12 py-3 rounded-md text-sm tracking-wide"
-            >
-              Submit
-            </button>
-          </div>
+            <div className="grid grid-cols-2 gap-12">
+              <input type="date" className={inputClass} />
+              <input
+                type="number"
+                placeholder="No. of Days*"
+                className={inputClass}
+              />
+            </div>
 
-        </form>
+            {/* SUBMIT (VISIBLE WITHOUT SCROLL) */}
+            <div className="text-center pt-6">
+              <button
+                type="submit"
+                className="bg-gold text-white px-12 py-3 rounded-md text-sm tracking-wide"
+              >
+                Submit
+              </button>
+            </div>
+
+          </form>
+
+        </div>
       </section>
 
     </main>

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { FaInstagram } from "react-icons/fa";
 
@@ -17,10 +18,16 @@ export default function Footer() {
         </div>
 
         {/* CENTER LOGO */}
-        <div className="text-center font-serif text-4xl tracking-wide">
-          IVORY
-          <div className="text-xs tracking-[0.35em] mt-1">FILMS</div>
-        </div>
+        <Link href="/" className="flex items-center mt-2 ml-auto mr-[400px]">
+        <Image
+          src="/images/logo/somu.PNG"
+          alt="Somu Films"
+          width={200}
+          height={80}
+          priority
+          className="object-contain"
+        />
+      </Link>
 
      {/* RIGHT */}
 <div className="flex items-center gap-14">
@@ -38,7 +45,7 @@ export default function Footer() {
     </Link>
 
     <div className="mb-4">+91 9737188899</div>
-    <div className="mt-1">hello@ivoryfilms.in</div>
+    <div className="mt-1">hello@somufilms.in</div>
   </div>
 </div>
 
@@ -48,8 +55,8 @@ export default function Footer() {
 
       {/* BOTTOM BAR */}
       <div className="mt-10 pt-6 border-t border-line text-xs flex justify-between">
-        <span>© 2025, IVORYFILMS.IN, ALL RIGHTS RESERVED.</span>
-        <span>Designed By ADRX</span>
+        <span>© 2025, SOMUFILMS.IN, ALL RIGHTS RESERVED.</span>
+        
       </div>
 
     </footer>

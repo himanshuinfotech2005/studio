@@ -11,12 +11,12 @@ export default function Navbar({ white = false }) {
     >
       {/* LEFT MENU */}
       <nav className="flex gap-8 text-sm">
-        <Link href="/photography">Photography</Link>
-        <Link href="/films">Films</Link>
-        <Link href="/editorial">Editorial</Link>
-        <Link href="/blogs">Blogs</Link>
-        <Link href="/contact-us">Contact Us</Link>
-        <Link href="/faqs">FAQs</Link>
+        <Link href="/photography" className="transition-colors duration-300 hover:text-gold">Photography</Link>
+        <Link href="/films" className="transition-colors duration-300 hover:text-gold">Films</Link>
+        <Link href="/editorial" className="transition-colors duration-300 hover:text-gold">Editorial</Link>
+        <Link href="/blogs" className="transition-colors duration-300 hover:text-gold">Blogs</Link>
+        <Link href="/contact-us" className="transition-colors duration-300 hover:text-gold">Contact Us</Link>
+        <Link href="/faqs" className="transition-colors duration-300 hover:text-gold">FAQs</Link>
       </nav>
 
       {/* LOGO (PURE ml / mr CONTROL) */}
