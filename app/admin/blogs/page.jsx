@@ -1,131 +1,91 @@
 "use client";
 
-import { useState } from "react";
-import { db, storage } from "@/lib/firebase";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 
-function slugify(text) {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)+/g, "");
-}
+export default function AdminBlogsList() {
+  const [blogs, setBlogs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-export default function AdminBlogsPage() {
-  const [title, setTitle] = useState("");
-  const [excerpt, setExcerpt] = useState("");
-  const [content, setContent] = useState("");
-  const [image, setImage] = useState(null);
-  const [published, setPublished] = useState(false);
-  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        const res = await fetch("/api/blogs", { cache: "no-store" });
+        if (!res.ok) throw new Error("Failed to fetch");
+        const data = await res.json();
+        setBlogs(data);
+      } catch (error) {
+        console.error("Error fetching blogs:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleUpload = async () => {
-    if (!title || !excerpt || !content || !image) {
-      alert("All fields are required");
-      return;
-    }
+    fetchBlogs();
+  }, []);
 
-    setLoading(true);
-
-    try {
-      /* 1️⃣ Upload image */
-      const imageRef = ref(
-        storage,
-        `blogs/${Date.now()}-${image.name}`
-      );
-      await uploadBytes(imageRef, image);
-      const imageURL = await getDownloadURL(imageRef);
-
-      /* 2️⃣ Save blog */
-      await addDoc(collection(db, "blogs"), {
-        title,
-        slug: slugify(title),
-        excerpt,
-        content,
-        featuredImage: imageURL,
-        published,
-        createdAt: serverTimestamp(),
-      });
-
-      alert("Blog published successfully");
-
-      /* Reset */
-      setTitle("");
-      setExcerpt("");
-      setContent("");
-      setImage(null);
-      setPublished(false);
-
-    } catch (error) {
-      console.error(error);
-      alert("Upload failed");
-    }
-
-    setLoading(false);
-  };
+  if (loading) return <div className="p-16">Loading...</div>;
 
   return (
-    <main className="p-16 max-w-4xl">
-
-      <h1 className="font-serif text-4xl mb-10">
-        Add Blog
-      </h1>
-
-      {/* TITLE */}
-      <input
-        type="text"
-        placeholder="Blog Title"
-        className="w-full border-b py-3 mb-6 focus:outline-none"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
-
-      {/* EXCERPT */}
-      <textarea
-        placeholder="Short excerpt (for listing page)"
-        rows="3"
-        className="w-full border-b py-3 mb-6 focus:outline-none resize-none"
-        value={excerpt}
-        onChange={(e) => setExcerpt(e.target.value)}
-      />
-
-      {/* CONTENT */}
-      <textarea
-        placeholder="Full blog content (HTML supported)"
-        rows="8"
-        className="w-full border-b py-3 mb-6 focus:outline-none resize-none"
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-      />
-
-      {/* FEATURED IMAGE */}
-      <input
-        type="file"
-        accept="image/*"
-        className="mb-6"
-        onChange={(e) => setImage(e.target.files[0])}
-      />
-
-      {/* PUBLISH */}
-      <div className="flex items-center gap-3 mb-10">
-        <input
-          type="checkbox"
-          checked={published}
-          onChange={() => setPublished(!published)}
-        />
-        <label>Publish on website</label>
+    <main className="p-16 w-full">
+      <div className="flex justify-between items-center mb-10">
+        <h1 className="font-serif text-4xl">Blogs</h1>
+        <Link
+          href="/admin/blogs/new"
+          className="bg-black text-white px-6 py-3 text-sm tracking-wide hover:bg-gray-800 transition"
+        >
+          + ADD NEW
+        </Link>
       </div>
 
-      {/* SUBMIT */}
-      <button
-        onClick={handleUpload}
-        disabled={loading}
-        className="bg-black text-white px-10 py-3 text-sm tracking-wide"
-      >
-        {loading ? "PUBLISHING..." : "SAVE BLOG"}
-      </button>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {blogs.map((blog) => (
+          <div key={blog.id} className="border p-4 bg-white shadow-sm flex flex-col">
+            <div className="relative h-48 w-full mb-4 bg-gray-100 overflow-hidden">
+              {blog.images && blog.images.length > 0 ? (
+                <img
+                  src={blog.images[0]}
+                  alt={blog.title}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-400">
+                  No Image
+                </div>
+              )}
+            </div>
+            
+            <h2 className="font-serif text-xl mb-2 truncate">{blog.title}</h2>
+            <p className="text-sm text-gray-500 line-clamp-2 mb-4 grow">
+              {blog.shortDescription}
+            </p>
+            
+            <div className="flex justify-between items-center mt-4 border-t pt-4">
+               <span
+                className={`text-xs px-2 py-1 rounded ${
+                  blog.published
+                    ? "bg-green-100 text-green-800"
+                    : "bg-yellow-100 text-yellow-800"
+                }`}
+              >
+                {blog.published ? "Published" : "Draft"}
+              </span>
+              <Link
+                href={`/admin/blogs/${blog.id}`}
+                className="text-xs text-gray-500 hover:text-black underline"
+              >
+                Edit
+              </Link>
+            </div>
+          </div>
+        ))}
 
+        {blogs.length === 0 && (
+          <div className="col-span-full text-center py-20 text-gray-400">
+            No blogs found.
+          </div>
+        )}
+      </div>
     </main>
   );
 }

@@ -1,135 +1,82 @@
 "use client";
 
-import { useState } from "react";
-import { db, storage } from "@/lib/firebase";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 
-export default function AdminFilmsPage() {
-  const [title, setTitle] = useState("");
-  const [location, setLocation] = useState("");
-  const [description, setDescription] = useState("");
-  const [videoUrl, setVideoUrl] = useState("");
-  const [thumbnail, setThumbnail] = useState(null);
-  const [published, setPublished] = useState(false);
-  const [loading, setLoading] = useState(false);
+export default function AdminFilmsList() {
+  const [films, setFilms] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleUpload = async () => {
-    if (!title || !videoUrl || !thumbnail) {
-      alert("Title, video URL and thumbnail are required");
-      return;
-    }
+  useEffect(() => {
+    const fetchFilms = async () => {
+      try {
+        const res = await fetch("/api/films", { cache: "no-store" });
+        if (!res.ok) throw new Error("Failed to fetch");
+        const data = await res.json();
+        setFilms(data);
+      } catch (error) {
+        console.error("Error fetching films:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    setLoading(true);
+    fetchFilms();
+  }, []);
 
-    try {
-      /* 1️⃣ Upload thumbnail image */
-      const thumbRef = ref(
-        storage,
-        `films/thumbnails/${Date.now()}-${thumbnail.name}`
-      );
-      await uploadBytes(thumbRef, thumbnail);
-      const thumbURL = await getDownloadURL(thumbRef);
-
-      /* 2️⃣ Save film data */
-      await addDoc(collection(db, "films"), {
-        title,
-        location,
-        description,
-        videoUrl,
-        thumbnail: thumbURL,
-        published,
-        createdAt: serverTimestamp(),
-      });
-
-      alert("Film added successfully");
-
-      /* Reset */
-      setTitle("");
-      setLocation("");
-      setDescription("");
-      setVideoUrl("");
-      setThumbnail(null);
-      setPublished(false);
-
-    } catch (error) {
-      console.error(error);
-      alert("Upload failed");
-    }
-
-    setLoading(false);
-  };
+  if (loading) return <div className="p-16">Loading...</div>;
 
   return (
-    <main className="p-16 max-w-4xl">
-
-      <h1 className="font-serif text-4xl mb-10">
-        Add Film
-      </h1>
-
-      {/* TITLE */}
-      <input
-        type="text"
-        placeholder="Film Title / Couple Name"
-        className="w-full border-b py-3 mb-6 focus:outline-none"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
-
-      {/* LOCATION */}
-      <input
-        type="text"
-        placeholder="Location"
-        className="w-full border-b py-3 mb-6 focus:outline-none"
-        value={location}
-        onChange={(e) => setLocation(e.target.value)}
-      />
-
-      {/* DESCRIPTION */}
-      <textarea
-        placeholder="Film description"
-        rows="4"
-        className="w-full border-b py-3 mb-6 focus:outline-none resize-none"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-      />
-
-      {/* VIDEO URL */}
-      <input
-        type="text"
-        placeholder="Vimeo / YouTube Embed URL"
-        className="w-full border-b py-3 mb-6 focus:outline-none"
-        value={videoUrl}
-        onChange={(e) => setVideoUrl(e.target.value)}
-      />
-
-      {/* THUMBNAIL */}
-      <input
-        type="file"
-        accept="image/*"
-        className="mb-6"
-        onChange={(e) => setThumbnail(e.target.files[0])}
-      />
-
-      {/* PUBLISH */}
-      <div className="flex items-center gap-3 mb-10">
-        <input
-          type="checkbox"
-          checked={published}
-          onChange={() => setPublished(!published)}
-        />
-        <label>Publish on website</label>
+    <main className="p-16 w-full">
+      <div className="flex justify-between items-center mb-10">
+        <h1 className="font-serif text-4xl">Films</h1>
+        <Link
+          href="/admin/films/new"
+          className="bg-black text-white px-6 py-3 text-sm tracking-wide hover:bg-gray-800 transition"
+        >
+          + ADD NEW
+        </Link>
       </div>
 
-      {/* SUBMIT */}
-      <button
-        onClick={handleUpload}
-        disabled={loading}
-        className="bg-black text-white px-10 py-3 text-sm tracking-wide"
-      >
-        {loading ? "UPLOADING..." : "SAVE FILM"}
-      </button>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {films.map((film) => (
+          <div key={film.id} className="border p-4 bg-white shadow-sm">
+            <div className="relative h-48 w-full mb-4 bg-gray-100 overflow-hidden flex items-center justify-center">
+               {/* You can add a video thumbnail generator here later */}
+               <span className="text-gray-400 text-sm">Video Preview</span>
+            </div>
+            
+            <h2 className="font-serif text-xl mb-1 truncate">{film.title}</h2>
+            <p className="text-xs text-gray-500 uppercase tracking-wide mb-3">
+              {film.location || "No Location"}
+            </p>
+            
+            <div className="flex justify-between items-center mt-4 border-t pt-4">
+               <span
+                className={`text-xs px-2 py-1 rounded ${
+                  film.published
+                    ? "bg-green-100 text-green-800"
+                    : "bg-yellow-100 text-yellow-800"
+                }`}
+              >
+                {film.published ? "Published" : "Draft"}
+              </span>
+              <Link
+                href={`/admin/films/${film.id}`}
+                className="text-xs text-gray-500 hover:text-black underline"
+              >
+                Edit
+              </Link>
+            </div>
+          </div>
+        ))}
 
+        {films.length === 0 && (
+          <div className="col-span-full text-center py-20 text-gray-400">
+            No films found.
+          </div>
+        )}
+      </div>
     </main>
   );
 }

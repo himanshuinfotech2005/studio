@@ -2,17 +2,17 @@ import { db } from "@/lib/firebase";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
-const filmSchema = z.object({
+const photographySchema = z.object({
   title: z.string().min(1, "Title is required"),
-  location: z.string().min(1, "Location is required"),
+  location: z.string().optional(),
   description: z.string().optional(),
-  videoUrl: z.string().url("Invalid Video URL"),
-  published: z.boolean().optional().default(false),
+  coverImage: z.string().url("Invalid image URL"),
+  published: z.boolean(),
 });
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const docRef = db.collection("films").doc((await params).id);
+    const docRef = db.collection("photography").doc((await params).id);
     const doc = await docRef.get();
 
     if (!doc.exists) {
@@ -28,9 +28,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const body = await req.json();
-    const parsed = filmSchema.parse(body);
+    const parsed = photographySchema.parse(body);
 
-    const docRef = db.collection("films").doc((await params).id);
+    const docRef = db.collection("photography").doc((await params).id);
     await docRef.update({
       ...parsed,
       updatedAt: new Date(),
@@ -44,7 +44,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const docRef = db.collection("films").doc((await params).id);
+    const docRef = db.collection("photography").doc((await params).id);
     await docRef.delete();
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
