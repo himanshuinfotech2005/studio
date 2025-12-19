@@ -100,7 +100,7 @@ export default function PhotographyPage() {
       {/* ================= 1. BIG HERO SLIDER ================= */}
       <section className="relative h-screen w-full overflow-hidden">
         <div className="absolute top-0 left-0 z-50 w-full">
-          <Navbar white/>
+          <Navbar white />
         </div>
 
         {heroImages.map((src, i) => (
