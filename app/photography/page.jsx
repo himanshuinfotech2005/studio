@@ -29,7 +29,7 @@ export default function PhotographyPage() {
 
         {/* NAVBAR OVER HERO */}
         <div className="absolute top-0 left-0 z-50 w-full">
-          <Navbar white/>
+          <Navbar white />
         </div>
 
         {/* HERO IMAGES */}
@@ -71,14 +71,20 @@ export default function PhotographyPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
 
           {editorial.map((item, i) => (
-            <div key={i}>
-              <Image
-                src={item.image}
-                alt={item.title}
-                width={700}
-                height={900}
-                className="mb-6"
-              />
+            <div
+              key={i}
+              className="flex flex-col h-full"
+            >
+
+              {/* IMAGE — SAME SIZE */}
+              <div className="relative w-full aspect-[4/5] mb-6 overflow-hidden">
+                <Image
+                  src={item.image}
+                  alt={item.title}
+                  fill
+                  className="object-cover"
+                />
+              </div>
 
               {/* TITLE + LOCATION */}
               <div className="flex justify-between items-baseline mb-3">
@@ -91,14 +97,15 @@ export default function PhotographyPage() {
               </div>
 
               {/* DESCRIPTION */}
-              <p className="text-sm leading-7 text-muted mb-4">
+              <p className="text-sm leading-7 text-muted mb-4 flex-grow">
                 {item.desc}
               </p>
 
               {/* READ MORE */}
-              <span className="text-sm font-medium">
+              <span className="text-sm font-medium mt-auto">
                 READ MORE →
               </span>
+
             </div>
           ))}
 
@@ -115,18 +122,21 @@ const editorial = [
     title: "Yashvi X Karan",
     place: "Surat",
     image: "/images/photography/1.jpg",
-    desc: "Yashvi and Karan’s wedding was a serene and intimate affair, steeped in tradition yet infused with personal touches...",
+    desc:
+      "Yashvi and Karan’s wedding was a serene and intimate affair, steeped in tradition yet infused with personal touches...",
   },
   {
     title: "Nancy X Nevil",
     place: "Bali",
     image: "/images/photography/2.jpg",
-    desc: "Capturing the magic of love against Bali’s stunning backdrop, Nancy & Nevil’s celebration felt effortless and timeless...",
+    desc:
+      "Capturing the magic of love against Bali’s stunning backdrop, Nancy & Nevil’s celebration felt effortless and timeless...",
   },
   {
     title: "Sabrina and Ricky",
     place: "Bali",
     image: "/images/photography/3.jpg",
-    desc: "Somebody who betters you, somebody who inspires and encourages you in love and in life — that’s sacred...",
+    desc:
+      "Somebody who betters you, somebody who inspires and encourages you in love and in life — that’s sacred...",
   },
 ];
