@@ -71,9 +71,12 @@ export default function AdminPhotographyList() {
                 {photo.published ? "Published" : "Draft"}
               </span>
               
-              <button className="text-xs text-gray-500 hover:text-black underline">
+              <Link 
+                href={`/admin/photography/${photo.id}`}
+                className="text-xs text-gray-500 hover:text-black underline"
+              >
                 Edit
-              </button>
+              </Link>
             </div>
           </div>
         ))}

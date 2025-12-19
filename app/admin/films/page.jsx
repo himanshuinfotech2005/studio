@@ -61,9 +61,12 @@ export default function AdminFilmsList() {
               >
                 {film.published ? "Published" : "Draft"}
               </span>
-              <button className="text-xs text-gray-500 hover:text-black underline">
+              <Link
+                href={`/admin/films/${film.id}`}
+                className="text-xs text-gray-500 hover:text-black underline"
+              >
                 Edit
-              </button>
+              </Link>
             </div>
           </div>
         ))}

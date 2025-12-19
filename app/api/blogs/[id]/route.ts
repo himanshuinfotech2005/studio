@@ -2,17 +2,22 @@ import { db } from "@/lib/firebase";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
-const filmSchema = z.object({
+const blogSchema = z.object({
   title: z.string().min(1, "Title is required"),
-  location: z.string().min(1, "Location is required"),
-  description: z.string().optional(),
-  videoUrl: z.string().url("Invalid Video URL"),
+  shortDescription: z.string().min(1, "Short description is required"),
+  description: z.array(
+    z.object({
+      type: z.enum(["paragraph", "heading1", "heading2", "heading3"]),
+      content: z.string().min(1)
+    })
+  ).min(1, "At least one content block is required"),
+  images: z.array(z.string().url()).optional().default([]),
   published: z.boolean().optional().default(false),
 });
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const docRef = db.collection("films").doc((await params).id);
+    const docRef = db.collection("blog").doc((await params).id);
     const doc = await docRef.get();
 
     if (!doc.exists) {
@@ -28,9 +33,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const body = await req.json();
-    const parsed = filmSchema.parse(body);
+    const parsed = blogSchema.parse(body);
 
-    const docRef = db.collection("films").doc((await params).id);
+    const docRef = db.collection("blog").doc((await params).id);
     await docRef.update({
       ...parsed,
       updatedAt: new Date(),
@@ -44,7 +49,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const docRef = db.collection("films").doc((await params).id);
+    const docRef = db.collection("blog").doc((await params).id);
     await docRef.delete();
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
