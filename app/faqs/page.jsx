@@ -6,29 +6,30 @@ import Navbar from "@/components/Navbar";
 export default function FAQPage() {
   return (
     <main className="bg-[#F3ECE2]">
+
+      {/* NAVBAR */}
       <Navbar />
 
       {/* ================= INTRO ================= */}
-      <section className="max-w-4xl mx-auto text-center py-32 px-6">
-        <h1 className="font-serif text-5xl md:text-6xl mb-6">
-          We’re here to answer
-          <br /> all your questions
-        </h1>
+      <section className="max-w-5xl mx-auto text-center py-20 px-6">
+  <h1 className="font-serif text-5xl md:text-6xl mb-4">
+    We’re here to answer all your questions
+  </h1>
 
-        <p className="text-muted leading-7">
+        <p className="text-black/70 leading-7">
           If you don’t find what you’re looking for,
           feel free to reach out to us at{" "}
           <a
             href="mailto:hello@ivoryfilms.in"
-            className="underline"
+            className="underline hover:text-gold transition-colors"
           >
-            hello@ivoryfilms.in
+            hello@somufilms.in
           </a>
         </p>
       </section>
 
       {/* ================= FAQ LIST ================= */}
-      <section className="max-w-4xl mx-auto px-6 pb-40">
+      <section className="max-w-6xl mx-auto px-10 pb-40">
         {faqs.map((faq, index) => (
           <FAQItem key={index} faq={faq} />
         ))}
@@ -44,21 +45,25 @@ function FAQItem({ faq }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="border-t border-line py-6">
+    <div className="border-b border-black/70 py-8">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex justify-between items-start text-left"
+        className="w-full flex items-center justify-between text-left"
       >
-        <h3 className="font-serif text-xl pr-6">
+        {/* QUESTION */}
+        <h3 className="font-serif text-[20px] md:text-[21px] leading-snug pr-10">
           {faq.question}
         </h3>
+
+        {/* PLUS ICON */}
         <span className="text-2xl font-light">
           {open ? "–" : "+"}
         </span>
       </button>
 
+      {/* ANSWER */}
       {open && (
-        <div className="mt-4 text-muted text-sm leading-7">
+        <div className="mt-5 text-sm leading-7 text-black/70 max-w-4xl">
           {faq.answer}
         </div>
       )}
@@ -70,52 +75,67 @@ function FAQItem({ faq }) {
 
 const faqs = [
   {
-    question: "Do you travel for weddings?",
+    question: "Where are you based and how far can you travel?",
     answer: (
       <>
-        Yes, absolutely. We love travelling and are happy to document
-        weddings across India and internationally. Travel and accommodation
-        are billed separately.
+        We are based in India and love travelling for weddings.
+        We are available for events across India and internationally.
+        Travel and accommodation are billed separately.
       </>
     ),
   },
   {
-    question: "How far in advance should we book you?",
+    question: "How can we book you?",
     answer: (
       <>
-        We recommend booking us at least 6–8 months in advance,
-        especially for peak wedding season dates.
+        To book us, please fill out the contact form on our website.
+        Once we receive your details, we’ll connect with you to discuss
+        availability and next steps.
       </>
     ),
   },
   {
-    question: "What do your photography deliverables include?",
+    question: "What are your deliverables?",
     answer: (
       <>
-        <strong>PHOTOS</strong>
+        <strong>PHOTOGRAPHY</strong>
         <br />
-        High-resolution edited images, delivered via a private online gallery.
+        High-resolution edited images delivered via a private online gallery.
         Turnaround time is approximately 8–10 weeks.
-      </>
-    ),
-  },
-  {
-    question: "What films do you deliver?",
-    answer: (
-      <>
+        <br /><br />
         <strong>FILMS</strong>
         <br />
-        You’ll receive a cinematic wedding film along with shorter edits
-        like teasers and highlights. Delivery timeline is 10–12 weeks.
+        Cinematic wedding films along with shorter edits such as teasers
+        and highlights. Delivery timeline is 10–12 weeks.
       </>
     ),
   },
   {
-    question: "How does payment work?",
+    question: "How much do you charge and what are the payment terms?",
     answer: (
       <>
-        A booking amount is required to secure your date.
-        The remaining balance is payable before the wedding.
+        Our pricing depends on the scope and scale of the wedding.
+        A booking amount is required to secure your date,
+        with the remaining balance payable before the event.
+      </>
+    ),
+  },
+  {
+    question: "What are the delivery timelines?",
+    answer: (
+      <>
+        Photography is typically delivered within 8–10 weeks,
+        while films are delivered within 10–12 weeks after the wedding.
+      </>
+    ),
+  },
+  {
+    question: "How do you guys work?",
+    answer: (
+      <>
+        We believe in documenting weddings organically.
+        Our approach is unobtrusive, focusing on real moments,
+        emotions, and storytelling rather than staged shots.
       </>
     ),
   },

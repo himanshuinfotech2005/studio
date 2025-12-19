@@ -1,3 +1,4 @@
+import Navbar from "@/components/Navbar";
 import Image from "next/image";
 
 export default function HomePage() {
@@ -6,6 +7,10 @@ export default function HomePage() {
 
       {/* ================= HERO SECTION ================= */}
       <section className="relative h-screen w-full">
+         {/* NAVBAR OVER HERO */}
+                <div className="absolute top-0 left-0 z-50 w-full">
+                  <Navbar white/>
+                </div>
 
         <Image
           src="/images/home-hero.jpg"
@@ -19,12 +24,7 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-black/20" />
 
         {/* Logo Center */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-white text-center font-serif">
-            <h1 className="text-7xl tracking-wide">IVORY</h1>
-            <p className="tracking-[0.5em] text-sm mt-2">FILMS</p>
-          </div>
-        </div>
+        
       </section>
 
       {/* ================= INTRO TEXT ================= */}
