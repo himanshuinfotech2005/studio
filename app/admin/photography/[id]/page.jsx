@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { LoadingSpinner, BackButton } from "../../components/AdminUI";
 
 export default function AdminPhotographyEditPage() {
   const { id } = useParams();
@@ -10,10 +11,7 @@ export default function AdminPhotographyEditPage() {
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");
   const [description, setDescription] = useState("");
-  
-  // Store image data. For existing images, deleteUrl will be undefined.
   const [imageData, setImageData] = useState(null); 
-  
   const [published, setPublished] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -36,12 +34,10 @@ export default function AdminPhotographyEditPage() {
           setImageData({
             url: data.coverImage,
             thumb: data.coverImage,
-            // No deleteUrl for existing images unless we stored it previously
           });
         }
       } catch (error) {
         console.error(error);
-        alert("Error loading photography details");
         router.push("/admin/photography");
       } finally {
         setLoading(false);
@@ -89,7 +85,6 @@ export default function AdminPhotographyEditPage() {
     if (!imageData) return;
     if (!confirm("Remove this image?")) return;
 
-    // Only try to delete from ImgBB if we have a deleteUrl (newly uploaded images)
     if (imageData.deleteUrl) {
       try {
         await fetch("/api/delete-imgbb", {
@@ -101,7 +96,6 @@ export default function AdminPhotographyEditPage() {
         console.error("Delete error:", error);
       }
     }
-    
     setImageData(null);
   };
 
@@ -110,9 +104,7 @@ export default function AdminPhotographyEditPage() {
       alert("Title and image are required");
       return;
     }
-
     setSaving(true);
-
     try {
       const response = await fetch(`/api/photography/${id}`, {
         method: "PUT",
@@ -125,9 +117,7 @@ export default function AdminPhotographyEditPage() {
           published,
         }),
       });
-
       if (!response.ok) throw new Error("Failed to update");
-
       alert("Updated successfully");
       router.push("/admin/photography");
     } catch (error) {
@@ -139,13 +129,11 @@ export default function AdminPhotographyEditPage() {
   };
 
   const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete this entry? This cannot be undone.")) return;
-    
+    if (!confirm("Are you sure you want to delete this entry?")) return;
     setSaving(true);
     try {
       const response = await fetch(`/api/photography/${id}`, { method: "DELETE" });
       if (!response.ok) throw new Error("Failed to delete");
-      
       router.push("/admin/photography");
     } catch (error) {
       alert("Delete failed: " + error.message);
@@ -153,10 +141,12 @@ export default function AdminPhotographyEditPage() {
     }
   };
 
-  if (loading) return <div className="p-16">Loading...</div>;
+  if (loading) return <LoadingSpinner />;
 
   return (
     <main className="p-16 max-w-4xl">
+      <BackButton />
+      
       <div className="flex justify-between items-center mb-10">
         <h1 className="font-serif text-4xl">Edit Photography</h1>
         <button 

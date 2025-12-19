@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { LoadingSpinner, BackButton } from "../../components/AdminUI";
 
 export default function AdminFilmEditPage() {
   const { id } = useParams();
@@ -89,10 +90,12 @@ export default function AdminFilmEditPage() {
     }
   };
 
-  if (loading) return <div className="p-16">Loading...</div>;
+  if (loading) return <LoadingSpinner />;
 
   return (
     <main className="p-16 max-w-4xl">
+      <BackButton />
+      
       <div className="flex justify-between items-center mb-10">
         <h1 className="font-serif text-4xl">Edit Film</h1>
         <button 

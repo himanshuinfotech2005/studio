@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { LoadingSpinner, BackButton } from "../components/AdminUI";
 
 export default function AdminEditorialPage() {
   const [images, setImages] = useState([]);
@@ -93,6 +94,8 @@ export default function AdminEditorialPage() {
 
   return (
     <main className="p-16 w-full relative min-h-screen">
+       <BackButton href="/admin/dashboard" />
+
        {/* Header */}
        <div className="flex justify-between items-center mb-10">
         <h1 className="font-serif text-4xl">Editorial Gallery</h1>
@@ -110,7 +113,7 @@ export default function AdminEditorialPage() {
 
       {/* Grid */}
       {loading ? (
-        <div>Loading...</div>
+        <LoadingSpinner />
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {images.map(img => (
@@ -154,7 +157,7 @@ export default function AdminEditorialPage() {
               </button>
               <button 
                 onClick={handleDelete}
-                className="px-6 py-2 bg-red-600 text-white text-sm font-semibold rounded-md shadow-md hover:bg-red-700 transition"
+                className="px-6 py-2 bg-red-600 text-white text-sm hover:bg-red-700 transition"
               >
                 DELETE IMAGE
               </button>

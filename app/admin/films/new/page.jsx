@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { BackButton } from "../../components/AdminUI";
 
 export default function AdminNewFilmPage() {
   const [title, setTitle] = useState("");
@@ -50,6 +51,7 @@ export default function AdminNewFilmPage() {
 
   return (
     <main className="p-16 max-w-4xl">
+      <BackButton />
       <h1 className="font-serif text-4xl mb-10">Add Film</h1>
 
       {/* TITLE */}
@@ -104,7 +106,7 @@ export default function AdminNewFilmPage() {
         disabled={loading}
         className="bg-black text-white px-10 py-3 text-sm tracking-wide disabled:opacity-50"
       >
-        {loading ? "UPLOADING..." : "SAVE FILM"}
+        {loading ? "SAVING..." : "SAVE FILM"}
       </button>
     </main>
   );
