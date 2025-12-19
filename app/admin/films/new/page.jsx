@@ -1,42 +1,34 @@
 "use client";
 
 import { useState } from "react";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { storage } from "@/lib/firebase-client"; // Only import storage from client SDK
 import { useRouter } from "next/navigation";
 
-export default function AdminPhotographyPage() {
+export default function AdminNewFilmPage() {
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");
   const [description, setDescription] = useState("");
-  const [image, setImage] = useState(null);
+  const [videoUrl, setVideoUrl] = useState("");
   const [published, setPublished] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleUpload = async () => {
-    if (!image || !title) {
-      alert("Title and image are required");
+  const handleSubmit = async () => {
+    if (!title || !videoUrl) {
+      alert("Title and Video URL are required");
       return;
     }
 
     setLoading(true);
 
     try {
-      /* 1️⃣ Upload image to Firebase Storage (Client Side) */
-      const imageRef = ref(storage, `photography/${Date.now()}-${image.name}`);
-      await uploadBytes(imageRef, image);
-      const imageURL = await getDownloadURL(imageRef);
-
-      /* 2️⃣ Send data to API */
-      const response = await fetch("/api/photography", {
+      const response = await fetch("/api/films", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title,
           location,
           description,
-          coverImage: imageURL,
+          videoUrl,
           published,
         }),
       });
@@ -46,11 +38,11 @@ export default function AdminPhotographyPage() {
         throw new Error(errorData.error || "Failed to save");
       }
 
-      alert("Photography added successfully");
-      router.push("/admin/photography"); // Redirect back to list
+      alert("Film added successfully");
+      router.push("/admin/films");
     } catch (error) {
       console.error(error);
-      alert("Upload failed: " + error.message);
+      alert("Error: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -58,7 +50,7 @@ export default function AdminPhotographyPage() {
 
   return (
     <main className="p-16 max-w-4xl">
-      <h1 className="font-serif text-4xl mb-10">Add Photography</h1>
+      <h1 className="font-serif text-4xl mb-10">Add Film</h1>
 
       {/* TITLE */}
       <input
@@ -78,6 +70,15 @@ export default function AdminPhotographyPage() {
         onChange={(e) => setLocation(e.target.value)}
       />
 
+      {/* VIDEO URL */}
+      <input
+        type="url"
+        placeholder="Video URL (Vimeo/YouTube)"
+        className="w-full border-b py-3 mb-6 focus:outline-none"
+        value={videoUrl}
+        onChange={(e) => setVideoUrl(e.target.value)}
+      />
+
       {/* DESCRIPTION */}
       <textarea
         placeholder="Description"
@@ -85,14 +86,6 @@ export default function AdminPhotographyPage() {
         className="w-full border-b py-3 mb-6 focus:outline-none resize-none"
         value={description}
         onChange={(e) => setDescription(e.target.value)}
-      />
-
-      {/* IMAGE */}
-      <input
-        type="file"
-        accept="image/*"
-        className="mb-6"
-        onChange={(e) => setImage(e.target.files[0])}
       />
 
       {/* PUBLISH */}
@@ -107,11 +100,11 @@ export default function AdminPhotographyPage() {
 
       {/* SUBMIT */}
       <button
-        onClick={handleUpload}
+        onClick={handleSubmit}
         disabled={loading}
         className="bg-black text-white px-10 py-3 text-sm tracking-wide disabled:opacity-50"
       >
-        {loading ? "UPLOADING..." : "SAVE PHOTOGRAPHY"}
+        {loading ? "UPLOADING..." : "SAVE FILM"}
       </button>
     </main>
   );

@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { collection, getDocs, orderBy, query } from "firebase/firestore";
-import { db } from "@/lib/firebase-client"; // Ensure you have db exported from here
 
 export default function AdminPhotographyList() {
   const [photos, setPhotos] = useState([]);
@@ -12,12 +10,9 @@ export default function AdminPhotographyList() {
   useEffect(() => {
     const fetchPhotos = async () => {
       try {
-        const q = query(collection(db, "photography"), orderBy("createdAt", "desc"));
-        const querySnapshot = await getDocs(q);
-        const data = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        const res = await fetch("/api/photography", { cache: "no-store" });
+        if (!res.ok) throw new Error("Failed to fetch");
+        const data = await res.json();
         setPhotos(data);
       } catch (error) {
         console.error("Error fetching photography:", error);
@@ -76,7 +71,6 @@ export default function AdminPhotographyList() {
                 {photo.published ? "Published" : "Draft"}
               </span>
               
-              {/* You can add Edit/Delete buttons here later */}
               <button className="text-xs text-gray-500 hover:text-black underline">
                 Edit
               </button>

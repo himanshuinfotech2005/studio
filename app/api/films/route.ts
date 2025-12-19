@@ -1,23 +1,27 @@
 import { db } from "@/lib/firebase";
-import { addDoc, collection, getDocs, serverTimestamp } from "firebase/firestore";
 import { NextRequest, NextResponse } from "next/server";
 import { z, ZodError } from "zod";
 
 const filmSchema = z.object({
-  title: z.string().min(1),
-  location: z.string().min(1),
-  description: z.string().min(1),
-  videoUrl: z.string().url()
+  title: z.string().min(1, "Title is required"),
+  location: z.string().min(1, "Location is required"),
+  description: z.string().optional(),
+  videoUrl: z.string().url("Invalid Video URL"),
+  published: z.boolean().optional().default(false),
 });
 
 export async function GET(req: NextRequest) {
   try {
-    const snap = await getDocs(collection(db, "films"));
-    const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const snapshot = await db.collection("films").orderBy("createdAt", "desc").get();
+    const items = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+      createdAt: doc.data().createdAt?.toDate().toISOString(),
+    }));
     return NextResponse.json(items, { status: 200 });
   } catch (error) {
     return NextResponse.json(
-      { error: "Failed to fetch films", message: error instanceof Error ? error.message : String(error) },
+      { error: "Failed to fetch films", message: String(error) },
       { status: 500 }
     );
   }
@@ -27,18 +31,20 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const parsed = filmSchema.parse(body);
-    const ref = await addDoc(collection(db, "films"), {
+    
+    const docRef = await db.collection("films").add({
       ...parsed,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
+      createdAt: new Date(),
+      updatedAt: new Date()
     });
-    return NextResponse.json({ id: ref.id }, { status: 201 });
+    
+    return NextResponse.json({ id: docRef.id }, { status: 201 });
   } catch (error) {
-    if (error && typeof error === "object" && "issues" in error) {
-      return NextResponse.json({ error: "Validation failed", issues: (error as ZodError).issues }, { status: 400 });
+    if (error instanceof ZodError) {
+      return NextResponse.json({ error: "Validation failed", issues: error.issues }, { status: 400 });
     }
     return NextResponse.json(
-      { error: "Failed to create film", message: error instanceof Error ? error.message : String(error) },
+      { error: "Failed to create film", message: String(error) },
       { status: 500 }
     );
   }
