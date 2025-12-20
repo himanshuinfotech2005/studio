@@ -95,7 +95,7 @@ export default function BlogsPage() {
       <Navbar />
 
       {/* ================= INTRO ================= */}
-      <section className="text-center max-w-4xl mx-auto py-24 px-6">
+      <section className="text-center max-w-4xl mx-auto py-24 px-6 pt-50">
         <h1 className="font-serif text-5xl md:text-6xl mb-4">
           Blogs
         </h1>

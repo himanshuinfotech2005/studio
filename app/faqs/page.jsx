@@ -5,7 +5,7 @@ import Navbar from "@/components/Navbar";
 
 export default function FAQPage() {
   return (
-    <main className="bg-[#F3ECE2]">
+    <main className="bg-[#F3ECE2] pt-32">
 
       {/* NAVBAR */}
       <Navbar />

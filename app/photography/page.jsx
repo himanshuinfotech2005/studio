@@ -143,7 +143,7 @@ export default function PhotographyPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-x-10 gap-y-20">
             {albums.map((album) => (
-              <Link href={`/photography/${album.id}`} key={album.id} className="group block">
+              <Link href={`/photography/${album.id}`} key={album.id} className="group flex flex-col h-full">
                 <div className="relative aspect-[3/4] mb-6 overflow-hidden bg-gray-200">
                   {album.images && album.images.length > 0 ? (
                     <Image
@@ -160,7 +160,7 @@ export default function PhotographyPage() {
 
                 {/* TITLE + LOCATION */}
                 <div className="flex justify-between items-baseline mb-3 border-b border-black/10 pb-3">
-                  <h3 className="font-serif text-2xl group-hover:text-gray-600 transition-colors">
+                  <h3 className="font-serif text-2xl group-hover:text-gray-600 transition-colors line-clamp-1">
                     {album.title}
                   </h3>
                   <span className="text-xs uppercase tracking-widest text-gray-500">
@@ -169,12 +169,12 @@ export default function PhotographyPage() {
                 </div>
 
                 {/* DESCRIPTION */}
-                <p className="text-sm leading-7 text-gray-600 mb-4 line-clamp-3">
+                <p className="text-sm leading-7 text-gray-600 mb-6 line-clamp-3 flex-grow">
                   {album.description}
                 </p>
 
                 {/* READ MORE */}
-                <span className="text-xs font-bold tracking-widest uppercase border-b border-transparent group-hover:border-black transition-all">
+                <span className="mt-auto text-xs font-bold tracking-widest uppercase border-b border-transparent group-hover:border-black transition-all w-fit">
                   View Album
                 </span>
               </Link>
