@@ -72,8 +72,8 @@ export default function Navbar({ white = false }) {
           </div>
 
           {/* ================= CENTER LOGO ================= */}
-          <div className="absolute left-1/2 top-1/2 sm:-translate-x-1/4 -translate-x-1/2 -translate-y-1/2 mt-2">
-            <Link href="/" className="block pl-10 w-44 h-18 md:w-56 md:h-22">
+          <div className="absolute left-1/2 top-1/2 sm:-translate-x-1/4 -translate-x-1/2 -translate-y-1/2 mt-2 z-50">
+            <Link href="/" className="block pl-10 w-44 h-18 md:w-56 md:h-22 relative">
               <Image
                 src={isTransparent ? darkLogo : lightLogo}
                 alt="Somu Films"
@@ -113,10 +113,10 @@ export default function Navbar({ white = false }) {
 
           {/* ================= MOBILE HAMBURGER ================= */}
           {/* Added z-50 relative to ensure button stays on top of the overlay */}
-          <div className="flex md:hidden flex-1 justify-end relative z-50">
+          <div className="flex md:hidden flex-1 justify-end relative z-50 pointer-events-none">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className={`p-2 ${textColor}`}
+              className={`p-2 ${textColor} pointer-events-auto`}
             >
               <div className="w-6 flex flex-col gap-1.5">
                 <span className={`h-0.5 bg-current transition ${isOpen ? "rotate-45 translate-y-2" : ""}`} />

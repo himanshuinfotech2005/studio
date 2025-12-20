@@ -350,51 +350,6 @@ export default function HomePage() {
       {/* ================= FILMS + MEDIA & RECOGNITION ================= */}
       <section className="bg-[#F3ECE2] px-10 md:px-20 pt-10 pb-25">
 
-        {/* ================= MEDIA & RECOGNITION ================= */}
-        <div className="max-w-5xl mx-auto text-center mb-28">
-          <h2 className="font-soligant text-[42px] md:text-[56px] mb-6">
-            Media and Recognitions
-          </h2>
-
-          <p className="text-sm leading-7 text-muted max-w-4xl mx-auto mb-6">
-            We are honored to be featured on leading media pages and top wedding
-            platforms, highlighting our commitment to excellence and dedication
-            to making your special day truly extraordinary.
-          </p>
-
-          <p className="text-sm leading-7 text-muted max-w-4xl mx-auto">
-            At Somu Films, we celebrate the unconventional, the adventurous,
-            and the modern couples who dare to stand apart. We believe that
-            the paramount role of a wedding photographer is to encapsulate the
-            very essence of the wedding’s ambiance and the distinct personalities
-            of the couple.
-          </p>
-        </div>
-
-        {/* LOGO GRID */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-y-16 gap-x-20 items-center justify-items-center mb-40">
-          {[
-            "/images/media/toi.svg",
-            "/images/media/ht.svg",
-            "/images/media/economic-times.svg",
-            "/images/media/indian-express.svg",
-            "/images/media/india-today.svg",
-            "/images/media/filmfare.svg",
-            "/images/media/ndtv.svg",
-            "/images/media/india-tv.png",
-            "/images/media/weddingsutra.svg",
-            "/images/media/wedmegood.svg",
-            "/images/media/weddingwire.svg",
-            "/images/media/weddingplz.svg",
-          ].map((src, i) => (
-            <img
-              key={i}
-              src={src}
-              alt="Media Logo"
-              className="max-h-[60px] w-auto object-contain opacity-90"
-            />
-          ))}
-        </div>
 
         {/* ================= FILMS ================= */}
         <h2 className="font-soligant text-4xl md:text-5xl text-center mb-20">
@@ -440,6 +395,52 @@ export default function HomePage() {
           >
             Explore Films
           </a>
+        </div>
+
+        {/* ================= MEDIA & RECOGNITION ================= */}
+        <div className="max-w-5xl mx-auto text-center mb-28">
+          <h2 className="font-soligant text-[42px] md:text-[56px] mb-6">
+            Media and Recognitions
+          </h2>
+
+          <p className="text-sm leading-7 text-muted max-w-4xl mx-auto mb-6">
+            We are honored to be featured on leading media pages and top wedding
+            platforms, highlighting our commitment to excellence and dedication
+            to making your special day truly extraordinary.
+          </p>
+
+          <p className="text-sm leading-7 text-muted max-w-4xl mx-auto">
+            At Somu Films, we celebrate the unconventional, the adventurous,
+            and the modern couples who dare to stand apart. We believe that
+            the paramount role of a wedding photographer is to encapsulate the
+            very essence of the wedding’s ambiance and the distinct personalities
+            of the couple.
+          </p>
+        </div>
+
+        {/* LOGO GRID */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-y-16 gap-x-20 items-center justify-items-center">
+          {[
+            "/images/media/toi.svg",
+            "/images/media/ht.svg",
+            "/images/media/economic-times.svg",
+            "/images/media/indian-express.svg",
+            "/images/media/india-today.svg",
+            "/images/media/filmfare.svg",
+            "/images/media/ndtv.svg",
+            "/images/media/india-tv.png",
+            "/images/media/weddingsutra.svg",
+            "/images/media/wedmegood.svg",
+            "/images/media/weddingwire.svg",
+            "/images/media/weddingplz.svg",
+          ].map((src, i) => (
+            <img
+              key={i}
+              src={src}
+              alt="Media Logo"
+              className="max-h-15 w-auto object-contain opacity-90"
+            />
+          ))}
         </div>
       </section>
 
