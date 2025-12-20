@@ -36,7 +36,7 @@ export default function AlbumPage() {
       <main className="bg-[#F3ECE2] min-h-screen">
         <Navbar />
         <div className="flex justify-center items-center h-[80vh]">
-          <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-black"></div>
+          <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-black" />
         </div>
       </main>
     );
@@ -48,7 +48,7 @@ export default function AlbumPage() {
         <Navbar />
         <div className="flex flex-col justify-center items-center h-[80vh] gap-4">
           <h1 className="font-serif text-3xl">Album Not Found</h1>
-          <Link href="/photography" className="text-sm underline hover:text-gray-600">
+          <Link href="/photography" className="text-sm underline">
             ← Back to Photography
           </Link>
         </div>
@@ -61,28 +61,33 @@ export default function AlbumPage() {
       <Navbar />
 
       {/* ================= HEADER ================= */}
-      <section className="pt-32 pb-16 px-6 md:px-16 max-w-6xl mx-auto text-center">
-        <p className="text-xs font-bold tracking-widest uppercase text-gray-500 mb-4">
-          {album.location}
-        </p>
-        <h1 className="font-soligant text-4xl md:text-6xl mb-8 leading-tight">
+      <section className="pt-50 pb-20 px-6 md:px-16 max-w-5xl mx-auto text-center">
+        {/* TITLE */}
+        <h1 className="font-soligant text-4xl md:text-6xl mb-4 leading-tight">
           {album.title}
         </h1>
-        <p className="text-gray-600 leading-8 max-w-2xl mx-auto whitespace-pre-wrap">
+
+        {/* LOCATION — NOW BELOW TITLE */}
+        <p className="text-sm tracking-widest uppercase text-gray-600 mb-6">
+          {album.location}
+        </p>
+
+        {/* DESCRIPTION */}
+        <p className="text-gray-600 leading-8 max-w-3xl mx-auto whitespace-pre-wrap">
           {album.description}
         </p>
       </section>
 
-      {/* ================= IMAGES GRID ================= */}
-      <section className="px-4 md:px-8 pb-32">
-        <div className="columns-1 md:columns-2 lg:columns-3 gap-4 space-y-4 max-w-7xl mx-auto">
-          {album.images && album.images.map((src, index) => (
-            <div key={index} className="relative w-full break-inside-avoid">
+      {/* ================= IMAGES GRID (2 COLUMN BIG) ================= */}
+      <section className="px-4 md:px-10 pb-32">
+        <div className="columns-1 md:columns-2 gap-6 space-y-6 max-w-6xl mx-auto">
+          {album.images?.map((src, index) => (
+            <div key={index} className="break-inside-avoid">
               <Image
                 src={src}
-                alt={`${album.title} - Image ${index + 1}`}
-                width={800}
-                height={1200}
+                alt={`${album.title} image ${index + 1}`}
+                width={1200}
+                height={1600}
                 className="w-full h-auto object-cover"
                 unoptimized
               />
@@ -91,11 +96,11 @@ export default function AlbumPage() {
         </div>
       </section>
 
-      {/* ================= NAVIGATION ================= */}
-      <section className="pb-20 text-center">
-        <Link 
+      {/* ================= BACK LINK ================= */}
+      <section className="pb-24 text-center">
+        <Link
           href="/photography"
-          className="inline-block border-b border-black pb-1 text-sm tracking-widest hover:text-gray-600 hover:border-gray-600 transition-colors"
+          className="inline-block border-b border-black pb-1 text-sm tracking-widest hover:text-gray-600 hover:border-gray-600 transition"
         >
           BACK TO ALL ALBUMS
         </Link>
