@@ -82,7 +82,7 @@ useEffect(() => {
 
   {/* BIG HEADING */}
   <h2 className="
-    relative z-20 font-serif
+    relative z-20 font-soligant
     text-3xl md:text-[56px]
     leading-tight text-center
     mb-12 md:mb-20
