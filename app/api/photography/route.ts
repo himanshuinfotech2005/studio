@@ -15,8 +15,18 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const limit = parseInt(searchParams.get("limit") || "6");
     const lastId = searchParams.get("lastId");
+    const isAdmin = searchParams.get("admin") === "true";
+    
+    // Initialize query (typed as any to allow reassignment between CollectionReference and Query)
+    let query: any = db.collection("photography");
 
-    let query = db.collection("photography").orderBy("createdAt", "desc").limit(limit);
+    // Only filter by published if NOT admin
+    if (!isAdmin) {
+      query = query.where("published", "==", true);
+    }
+
+    // Apply ordering and limit
+    query = query.orderBy("createdAt", "desc").limit(limit);
 
     if (lastId) {
       const lastDoc = await db.collection("photography").doc(lastId).get();
@@ -27,7 +37,7 @@ export async function GET(req: NextRequest) {
 
     const snapshot = await query.get();
     
-    const items = snapshot.docs.map((doc) => ({
+    const items = snapshot.docs.map((doc: any) => ({
       id: doc.id,
       ...doc.data(),
       createdAt: doc.data().createdAt?.toDate().toISOString(),
@@ -40,6 +50,7 @@ export async function GET(req: NextRequest) {
     }, { status: 200 });
 
   } catch (error) {
+    console.error("Error fetching photography:", error);
     return NextResponse.json({ error: "Failed to fetch photography" }, { status: 500 });
   }
 }

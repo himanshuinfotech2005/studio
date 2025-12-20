@@ -166,7 +166,7 @@ export default function BlogsPage() {
                 <div key={blog.id} className="flex flex-col group">
                   
                   {/* IMAGE */}
-                  <Link href={`/blogs/${blog.id}`} className="relative w-full aspect-[4/3] mb-6 overflow-hidden bg-gray-200 block">
+                  <Link href={`/blogs/${blog.id}`} className="relative w-full aspect-4/3 mb-6 overflow-hidden bg-gray-200 block">
                     {blog.images && blog.images.length > 0 ? (
                       <Image
                         src={blog.images[0]}

@@ -16,7 +16,8 @@ export default function AdminBlogsList() {
       if (isInitial) setLoading(true);
       else setLoadingMore(true);
 
-      const params = new URLSearchParams({ limit: "10" }); // Higher limit for admin
+      // Added admin: "true" to see drafts
+      const params = new URLSearchParams({ limit: "10", admin: "true" }); 
       if (!isInitial && lastId) params.append("lastId", lastId);
 
       const res = await fetch(`/api/blogs?${params.toString()}`, { cache: "no-store" });

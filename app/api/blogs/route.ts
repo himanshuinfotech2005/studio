@@ -20,8 +20,16 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const limit = parseInt(searchParams.get("limit") || "6");
     const lastId = searchParams.get("lastId");
+    const isAdmin = searchParams.get("admin") === "true";
 
-    let query = db.collection("blog").orderBy("createdAt", "desc").limit(limit);
+    let query: any = db.collection("blog");
+
+    // Only filter by published if NOT admin
+    if (!isAdmin) {
+      query = query.where("published", "==", true);
+    }
+
+    query = query.orderBy("createdAt", "desc").limit(limit);
 
     if (lastId) {
       const lastDoc = await db.collection("blog").doc(lastId).get();
@@ -32,7 +40,7 @@ export async function GET(req: NextRequest) {
 
     const snapshot = await query.get();
     
-    const items = snapshot.docs.map((doc) => ({
+    const items = snapshot.docs.map((doc: any) => ({
       id: doc.id,
       ...doc.data(),
       createdAt: doc.data().createdAt?.toDate().toISOString(),
