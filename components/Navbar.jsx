@@ -11,6 +11,7 @@ export default function Navbar({ white = false }) {
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
 
+  // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
