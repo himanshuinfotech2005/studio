@@ -104,7 +104,7 @@ export default function Navbar({ white = false }) {
             <Link
               href="/contact-us"
               className="text-xs uppercase tracking-widest font-medium
-                bg-gold text-white px-6 py-3 rounded-full
+                bg-gold text-white px-6 py-3 rounded-[5px]
                 transition-opacity duration-300 hover:opacity-80"
             >
               Get in Touch
