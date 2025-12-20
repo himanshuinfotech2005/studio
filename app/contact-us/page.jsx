@@ -68,6 +68,13 @@ export default function ContactUsPage() {
           className="object-cover"
         />
         <div className="absolute inset-0 bg-black/30" />
+
+        {/* Centered Title Overlay */}
+        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+          <h1 className="font-soligant text-white text-6xl md:text-9xl tracking-wide drop-shadow-lg">
+            GET QUOTE
+          </h1>
+        </div>
       </section>
 
       {/* ================= INTRO ================= */}
