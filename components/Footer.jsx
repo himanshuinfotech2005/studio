@@ -21,7 +21,7 @@ export default function Footer() {
         <div className="order-1 md:order-2 flex-1 flex justify-center">
           <Link href="/" className="relative w-40 h-16 md:w-48 md:h-20">
             <Image
-              src="/images/logo/somu.PNG"
+              src="/light.png"
               alt="Somu Films"
               fill
               className="object-contain"

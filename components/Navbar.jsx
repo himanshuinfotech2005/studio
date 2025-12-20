@@ -4,7 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-
+import lightLogo from "../public/light.png";
+import darkLogo from "../public/images/logo/somu.png";
 export default function Navbar({ white = false }) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -61,7 +62,7 @@ export default function Navbar({ white = false }) {
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <Link href="/" className="relative block w-40 h-16 md:w-56 md:h-24">
              <Image
-              src="/images/logo/somu.PNG" 
+              src={isTransparent ? darkLogo : lightLogo} 
               alt="Somu Films"
               fill
               className="object-contain"
