@@ -197,37 +197,58 @@ useEffect(() => {
 </section>
 
 
-      {/* ================= PHOTOGRAPHY SECTION ================= */}
-      <section className="px-16 py-28">
-        <div className="flex justify-between items-center mb-14">
-          <h2 className="font-serif text-4xl">Photography</h2>
-          <a href="/photography" className="text-sm underline">
-            Explore Photography →
-          </a>
+   {/* ================= PHOTOGRAPHY SECTION ================= */}
+<section className="px-16 py-28">
+
+  {/* SECTION HEADING */}
+  <div className="mb-14 text-center">
+    <h2 className="font-serif text-4xl">Photography</h2>
+  </div>
+
+  {/* PHOTOGRAPHY GRID */}
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+    {[1, 2, 3].map((item) => (
+      <div key={item} className="flex flex-col">
+        <div className="relative w-full aspect-[3/4] mb-5 overflow-hidden">
+          <Image
+            src={`/images/photo-${item}.jpg`}
+            alt="Photography"
+            fill
+            className="object-cover"
+          />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-          {[1, 2, 3].map((item) => (
-            <div key={item} className="flex flex-col">
-              <div className="relative w-full aspect-[3/4] mb-5 overflow-hidden">
-                <Image
-                  src={`/images/photo-${item}.jpg`}
-                  alt="Photography"
-                  fill
-                  className="object-cover"
-                />
-              </div>
+        <h4 className="font-serif text-lg mb-1">
+          Luxury Wedding
+        </h4>
+        <p className="text-muted text-sm">
+          Jaipur, India
+        </p>
+      </div>
+    ))}
+  </div>
 
-              <h4 className="font-serif text-lg mb-1">
-                Luxury Wedding
-              </h4>
-              <p className="text-muted text-sm">
-                Jaipur, India
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
+  {/* EXPLORE BUTTON – CENTER & LAST */}
+  <div className="mt-20 text-center">
+    <a
+      href="/photography"
+      className="
+      inline-block
+      text-sm
+      px-6 py-2
+      rounded-full
+      bg-gold
+      text-white
+      transition-all duration-300
+      hover:opacity-80
+    "
+    >
+      Explore Photography
+    </a>
+  </div>
+
+</section>
+
 
      {/* ================= FILMS + MEDIA & RECOGNITION ================= */}
 <section className="bg-[#F3ECE2] px-10 md:px-20 pt-10 pb-25">
@@ -308,6 +329,23 @@ useEffect(() => {
     ))}
 
   </div>
+  <div className="mt-20 text-center">
+  <a
+    href="/films"
+    className="
+      inline-block
+      text-sm
+      px-6 py-2
+      rounded-full
+      bg-gold
+      text-white
+      transition-all duration-300
+      hover:opacity-80
+    "
+  >
+    Explore Films
+  </a>
+</div>
 </section>
 
 
