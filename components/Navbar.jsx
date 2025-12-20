@@ -102,7 +102,7 @@ export default function Navbar({ white = false }) {
           }`}
         >
           {/* Combine links + Contact for mobile menu */}
-          {[...navLinks, { name: "Get in Touch", href: "/contact" }].map((link) => (
+          {[...navLinks, { name: "Get in Touch", href: "/contact-us" }].map((link) => (
             <Link
               key={link.name}
               href={link.href}
