@@ -11,7 +11,6 @@ export default function Navbar({ white = false }) {
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
 
-  // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
@@ -40,7 +39,7 @@ export default function Navbar({ white = false }) {
   ];
 
   return (
-    <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${bgColorClass}`}>
+    <nav className={`fixed p-2 top-0 left-0 w-full z-50 transition-all duration-300 ${bgColorClass}`}>
       <div className="max-w-7xl mx-auto px-6 md:px-12 h-24 flex items-center justify-between relative">
         
         {/* --- DESKTOP LEFT: NAVIGATION --- */}
