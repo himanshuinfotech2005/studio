@@ -110,7 +110,7 @@ const VideoPlayer = ({ url, title, autoPlay = false }) => {
 export default function FilmsPage() {
   const [films, setFilms] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  let otherFilms = [];
   useEffect(() => {
     const fetchFilms = async () => {
       try {
@@ -118,6 +118,7 @@ export default function FilmsPage() {
         if (!res.ok) throw new Error("Failed to fetch films");
         const data = await res.json();
         setFilms(Array.isArray(data) ? data : (data.items || []));
+        otherFilms = Array.isArray(data) ? data.slice(1) : (data.items || []).slice(1);
       } catch (error) {
         console.error("Error loading films:", error);
       } finally {
@@ -129,20 +130,19 @@ export default function FilmsPage() {
   }, []);
 
   return (
-    <main className="bg-[#F3ECE2] min-h-screen">
+    <main className="bg-[#F3ECE2] min-h-screen pt-32">
       <Navbar />
-
-      {/* ================= FEATURED FILM (Static or First from DB) ================= */}
-      <section className="relative w-full aspect-video bg-black">
+      <section className="relative sm:p-5 w-full aspect-video bg-black">
         {films.length > 0 ? (
            // Ensure we check both 'video' and 'videoUrl' properties
-           <VideoPlayer url={films[0].video || films[0].videoUrl} title={films[0].title} autoPlay />
+           <VideoPlayer url={films[0].video || films[0].videoUrl} title={films[0].title} />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center text-white/50">
             Loading Featured Film...
           </div>
         )}
 
+        {/* Overlay Text (Only show if we have data) */}
         {films.length > 0 && (
           <div className="absolute inset-0 flex items-end px-6 md:px-16 pb-16 pointer-events-none">
             <h1 className="font-serif text-white text-3xl md:text-5xl drop-shadow-lg">
@@ -165,7 +165,7 @@ export default function FilmsPage() {
           <div className="text-center text-gray-500">Loading films...</div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-14">
-            {films.map((film, index) => (
+            {otherFilms.map((film, index) => (
               <div key={film.id || index} className="flex flex-col">
                 
                 {/* Video Thumbnail */}
@@ -188,8 +188,6 @@ export default function FilmsPage() {
           </div>
         )}
       </section>
-
-      {/* ================= CINEMATIC QUOTE ================= */}
       <section className="relative h-[60vh] md:h-[85vh] w-full">
         <Image
           src="/images/films/banner.jpg"
