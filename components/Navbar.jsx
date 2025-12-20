@@ -4,6 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import lightLogo from "../public/light.png";
+import darkLogo from "../public/images/logo/somu.png";
 import { FaInstagram } from "react-icons/fa";
 
 export default function Navbar({ white = false }) {
