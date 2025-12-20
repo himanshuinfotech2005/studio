@@ -52,7 +52,7 @@ export default function AdminNewFilmPage() {
   return (
     <main className="p-16 max-w-4xl">
       <BackButton />
-      <h1 className="font-serif text-4xl mb-10">Add Film</h1>
+      <h1 className="font-soligant text-4xl mb-10">Add Film</h1>
 
       {/* TITLE */}
       <input

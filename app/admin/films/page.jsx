@@ -32,7 +32,7 @@ export default function AdminFilmsList() {
       <BackButton href="/admin/dashboard" />
 
       <div className="flex justify-between items-center mb-10">
-        <h1 className="font-serif text-4xl">Films</h1>
+        <h1 className="font-soligant text-4xl">Films</h1>
         <Link
           href="/admin/films/new"
           className="bg-black text-white px-6 py-3 text-sm tracking-wide hover:bg-gray-800 transition"

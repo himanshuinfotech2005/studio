@@ -1,40 +1,33 @@
 @import "tailwindcss";
 
-
-/* ===== DESIGN TOKENS (FROM SCREENSHOTS) ===== */
 :root {
-  --bg-primary: #F3EDE3;     /* beige background */
-  --text-primary: #1A1A1A;  /* dark text */
+  --bg-primary: #F3EDE3;
+  --text-primary: #1A1A1A;
   --text-muted: #6B6B6B;
-  --gold: #B89B5E;          /* button / accent */
+  --gold: #B89B5E;          
   --line: #D8CFC0;
 }
 
-/* ===== TAILWIND v4 THEME MAPPING (MOST IMPORTANT) ===== */
 @theme {
   --color-bg: var(--bg-primary);
   --color-text: var(--text-primary);
   --color-muted: var(--text-muted);
   --color-gold: var(--gold);
   --color-line: var(--line);
-
-  --font-serif: IvorySerif, serif;
+  --font-soligant: var(--font-soligant);
+  --font-main: var(--font-main);
+  --font-serif:sans-serif;
   --font-sans: IvorySans, sans-serif;
 }
 
-/* ===== FONTS ===== */
-@font-face {
-  font-family: "IvorySerif";
-  src: url("/fonts/PlayfairDisplay-Regular.ttf");
-}
-
-@font-face {
-  font-family: "IvorySans";
-  src: url("/fonts/Inter-Regular.ttf");
-}
 
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  font-family: "IvorySans", sans-serif;
+  font-family: var(--font-main);
+  font-size: 18px !important;
+}
+
+h1,h2,h3,h4,h5,h6 {
+  font-family: var(--font-soligant) !important;
 }

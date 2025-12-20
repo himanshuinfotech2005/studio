@@ -65,7 +65,7 @@ export default function AlbumPage() {
         <p className="text-xs font-bold tracking-widest uppercase text-gray-500 mb-4">
           {album.location}
         </p>
-        <h1 className="font-serif text-4xl md:text-6xl mb-8 leading-tight">
+        <h1 className="font-soligant text-4xl md:text-6xl mb-8 leading-tight">
           {album.title}
         </h1>
         <p className="text-gray-600 leading-8 max-w-2xl mx-auto whitespace-pre-wrap">

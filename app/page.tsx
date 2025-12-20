@@ -68,7 +68,7 @@ useEffect(() => {
 
       {/* ================= INTRO TEXT ================= */}
       <section className="max-w-4xl mx-auto text-center py-24 px-6">
-        <h2 className="font-serif text-4xl mb-4">
+        <h2 className="font-soligant text-4xl mb-4">
           We capture love stories that feel timeless
         </h2>
         <p className="text-muted leading-7">
@@ -202,7 +202,7 @@ useEffect(() => {
 
   {/* SECTION HEADING */}
   <div className="mb-14 text-center">
-    <h2 className="font-serif text-4xl">Photography</h2>
+    <h2 className="font-soligant text-4xl">Photography</h2>
   </div>
 
   {/* PHOTOGRAPHY GRID */}
@@ -255,7 +255,7 @@ useEffect(() => {
 
   {/* ================= MEDIA & RECOGNITION ================= */}
   <div className="max-w-5xl mx-auto text-center mb-28">
-    <h2 className="font-serif text-[42px] md:text-[56px] mb-6">
+    <h2 className="font-soligant text-[42px] md:text-[56px] mb-6">
       Media and Recognitions
     </h2>
 
@@ -302,7 +302,7 @@ useEffect(() => {
 </div>
 
   {/* ================= FILMS ================= */}
-  <h2 className="font-serif text-4xl md:text-5xl text-center mb-20">
+  <h2 className="font-soligant text-4xl md:text-5xl text-center mb-20">
     Unforgettable Moments, Timeless Films
   </h2>
 

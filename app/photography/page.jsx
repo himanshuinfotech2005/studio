@@ -135,7 +135,7 @@ export default function PhotographyPage() {
       </section>
 
       {/* ================= 2. ALBUM GRID ================= */}
-      <section className="px-6 md:px-16 py-32">
+      <section className="px-6 md:px-16 pt-32">
         {loading ? (
           <div className="flex justify-center py-20">
             <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-black"></div>
@@ -187,17 +187,11 @@ export default function PhotographyPage() {
         )}
 
         {/* Loading Trigger */}
-        <div ref={observerTarget} className="h-10 w-full flex justify-center items-center mt-12">
+        <div ref={observerTarget} className="w-full flex justify-center items-center">
           {loadingMore && (
              <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-gray-400"></div>
           )}
         </div>
-        
-        {!hasMore && albums.length > 0 && (
-          <div className="text-center text-gray-500 py-10">
-            <span className="text-sm">You have seen all albums.</span>
-          </div>
-        )}
       </section>
     </main>
   );

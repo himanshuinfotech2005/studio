@@ -120,7 +120,7 @@ export default function AdminPhotographyPage() {
   return (
     <main className="p-8 md:p-16 max-w-5xl mx-auto">
       <BackButton href="/admin/photography" />
-      <h1 className="font-serif text-4xl mb-10">Add New Album</h1>
+      <h1 className="font-soligant text-4xl mb-10">Add New Album</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
         {/* TITLE */}
