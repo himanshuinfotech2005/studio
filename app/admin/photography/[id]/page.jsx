@@ -151,7 +151,7 @@ export default function AdminPhotographyEditPage() {
       <BackButton href="/admin/photography" />
       
       <div className="flex justify-between items-center mb-10">
-        <h1 className="font-soligant text-4xl">Edit Album</h1>
+        <h1 className="font-serif text-4xl">Edit Album</h1>
         <button 
           onClick={handleDelete}
           className="text-red-600 text-sm hover:underline font-medium"

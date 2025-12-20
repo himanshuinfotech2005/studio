@@ -22,6 +22,17 @@ const getYoutubeVideoId = (url) => {
 const VideoPlayer = ({ url, title, autoPlay = false }) => {
   const [isPlaying, setIsPlaying] = useState(autoPlay);
   const videoId = getYoutubeVideoId(url);
+  
+  // Use sddefault (640x480) as it's more reliable than maxresdefault
+  const [imgSrc, setImgSrc] = useState(
+    videoId ? `https://img.youtube.com/vi/${videoId}/sddefault.jpg` : ""
+  );
+
+  useEffect(() => {
+    if (videoId) {
+      setImgSrc(`https://img.youtube.com/vi/${videoId}/sddefault.jpg`);
+    }
+  }, [videoId]);
 
   if (!videoId) {
     return (
@@ -31,13 +42,32 @@ const VideoPlayer = ({ url, title, autoPlay = false }) => {
     );
   }
 
+  // Construct YouTube Embed URL
+  const baseUrl = `https://www.youtube.com/embed/${videoId}`;
+  const params = new URLSearchParams({
+    autoplay: "1",
+    rel: "0",
+    modestbranding: "1",
+    showinfo: "0",
+    // If autoPlay (Featured), hide controls. If not (Grid), show controls (1).
+    controls: autoPlay ? "0" : "1", 
+  });
+
+  if (autoPlay) {
+    params.append("mute", "1");
+    params.append("loop", "1");
+    params.append("playlist", videoId); // Required for loop to work
+  }
+
+  const iframeSrc = `${baseUrl}?${params.toString()}`;
+
   return (
     <div className="relative w-full h-full bg-black overflow-hidden group">
       {isPlaying ? (
         <iframe
-          src={`https://www.youtube.com/embed/${videoId}?autoplay=1&controls=0&rel=0&modestbranding=1&showinfo=0${autoPlay ? "&mute=1&loop=1&playlist=" + videoId : ""}`}
+          src={iframeSrc}
           className="absolute inset-0 w-full h-full"
-          // title={title || "YouTube video player"}
+          title={title || "YouTube video player"}
           frameBorder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           referrerPolicy="strict-origin-when-cross-origin"
@@ -50,11 +80,17 @@ const VideoPlayer = ({ url, title, autoPlay = false }) => {
           onClick={() => setIsPlaying(true)}
         >
           <Image
-            src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
+            src={imgSrc}
             alt={title || "Video thumbnail"}
             fill
             className="object-cover opacity-90 transition-opacity group-hover:opacity-100"
             unoptimized
+            onError={() => {
+              // Fallback to hqdefault if sddefault fails
+              if (imgSrc.includes("sddefault")) {
+                setImgSrc(`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`);
+              }
+            }}
           />
           
           {/* Play Button Overlay */}
@@ -81,7 +117,6 @@ export default function FilmsPage() {
         const res = await fetch("/api/films");
         if (!res.ok) throw new Error("Failed to fetch films");
         const data = await res.json();
-        // Handle array or paginated object
         setFilms(Array.isArray(data) ? data : (data.items || []));
       } catch (error) {
         console.error("Error loading films:", error);
@@ -99,16 +134,15 @@ export default function FilmsPage() {
 
       {/* ================= FEATURED FILM (Static or First from DB) ================= */}
       <section className="relative w-full aspect-video bg-black">
-        {/* You can make this dynamic too if you want, currently using a placeholder or the first film */}
         {films.length > 0 ? (
-           <VideoPlayer url={films[0].videoUrl} title={films[0].title} autoPlay />
+           // Ensure we check both 'video' and 'videoUrl' properties
+           <VideoPlayer url={films[0].video || films[0].videoUrl} title={films[0].title} autoPlay />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center text-white/50">
             Loading Featured Film...
           </div>
         )}
 
-        {/* Overlay Text (Only show if we have data) */}
         {films.length > 0 && (
           <div className="absolute inset-0 flex items-end px-6 md:px-16 pb-16 pointer-events-none">
             <h1 className="font-serif text-white text-3xl md:text-5xl drop-shadow-lg">
@@ -136,7 +170,8 @@ export default function FilmsPage() {
                 
                 {/* Video Thumbnail */}
                 <div className="aspect-video bg-black mb-5 relative shadow-lg">
-                  <VideoPlayer url={film.videoUrl} title={film.title} />
+                  {/* Ensure we check both 'video' and 'videoUrl' properties */}
+                  <VideoPlayer url={film.video || film.videoUrl} title={film.title} />
                 </div>
 
                 {/* Text */}
@@ -148,14 +183,6 @@ export default function FilmsPage() {
                 <p className="text-sm leading-6 text-gray-600 line-clamp-3 mb-4">
                   {film.description || "A cinematic wedding story capturing raw emotions and timeless celebrations."}
                 </p>
-
-                {/* Link using ID or Slug */}
-                <a
-                  href={`/films/${film.slug || film.id}`}
-                  className="inline-block text-xs font-bold tracking-widest underline hover:text-gray-600 transition-colors"
-                >
-                  WATCH FILM →
-                </a>
               </div>
             ))}
           </div>

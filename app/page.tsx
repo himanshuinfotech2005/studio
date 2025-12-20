@@ -28,6 +28,17 @@ const getYoutubeVideoId = (url: string) => {
 const VideoPlayer = ({ url, title }: { url: string, title: string }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const videoId = getYoutubeVideoId(url);
+  
+  // Use sddefault (640x480) as it's more reliable than maxresdefault
+  const [imgSrc, setImgSrc] = useState(
+    videoId ? `https://img.youtube.com/vi/${videoId}/sddefault.jpg` : ""
+  );
+
+  useEffect(() => {
+    if (videoId) {
+      setImgSrc(`https://img.youtube.com/vi/${videoId}/sddefault.jpg`);
+    }
+  }, [videoId]);
 
   if (!videoId) {
     // Fallback if URL is invalid, just show a placeholder so layout doesn't break
@@ -42,7 +53,7 @@ const VideoPlayer = ({ url, title }: { url: string, title: string }) => {
     <div className="relative aspect-video bg-black overflow-hidden group shadow-lg">
       {isPlaying ? (
         <iframe
-          src={`https://www.youtube.com/embed/${videoId}?autoplay=1&controls=0&rel=0&modestbranding=1&showinfo=0`}
+          src={`https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&rel=0&modestbranding=1&showinfo=0`}
           className="absolute inset-0 w-full h-full"
           title={title || "YouTube video player"}
           frameBorder="0"
@@ -56,11 +67,17 @@ const VideoPlayer = ({ url, title }: { url: string, title: string }) => {
           onClick={() => setIsPlaying(true)}
         >
           <Image
-            src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
+            src={imgSrc}
             alt={title || "Video thumbnail"}
             fill
             className="object-cover opacity-90 transition-opacity group-hover:opacity-100"
             unoptimized
+            onError={() => {
+              // Fallback to hqdefault if sddefault fails
+              if (imgSrc.includes("sddefault")) {
+                setImgSrc(`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`);
+              }
+            }}
           />
           
           {/* Custom Play Button Overlay */}
@@ -122,7 +139,6 @@ export default function HomePage() {
 
     return () => clearInterval(interval);
   }, [editorialSliderImages.length]);
-        console.log("films are these", films)
 
   return (
     <main className="bg-[#F3ECE2]">
@@ -390,7 +406,7 @@ export default function HomePage() {
             films.map((film, index) => (
               <div key={index} className="flex flex-col gap-6 group">
                 {/* Video Player */}
-                <VideoPlayer url={film.videoUrl} title={film.title} />
+                <VideoPlayer url={film.video || film.videoUrl} title={film.title} />
                 
                 {/* Metadata */}
                 <div className="text-center">
