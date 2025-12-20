@@ -18,8 +18,8 @@ export default function AdminPhotographyList() {
       if (isInitial) setLoading(true);
       else setLoadingMore(true);
 
-      // Use a higher limit for admin view
-      const params = new URLSearchParams({ limit: "12" });
+      // Use a higher limit for admin view and pass admin=true to see all records
+      const params = new URLSearchParams({ limit: "12", admin: "true" });
       if (!isInitial && lastId) params.append("lastId", lastId);
 
       const res = await fetch(`/api/photography?${params.toString()}`, { cache: "no-store" });
