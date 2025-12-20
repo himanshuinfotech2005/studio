@@ -132,28 +132,33 @@ export default function FilmsPage() {
   return (
     <main className="bg-[#F3ECE2] min-h-screen pt-32">
       <Navbar />
-      <section className="relative sm:p-5 w-full aspect-video bg-black">
-        {films.length > 0 ? (
-           // Ensure we check both 'video' and 'videoUrl' properties
-           <VideoPlayer url={films[0].video || films[0].videoUrl} title={films[0].title} />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center text-white/50">
-            Loading Featured Film...
-          </div>
-        )}
 
-        {/* Overlay Text (Only show if we have data) */}
-        {films.length > 0 && (
-          <div className="absolute inset-0 flex items-end px-6 md:px-16 pb-16 pointer-events-none">
-            <h1 className="font-serif text-white text-3xl md:text-5xl drop-shadow-lg">
-              {films[0].title}
-            </h1>
-          </div>
-        )}
+      {/* ================= FEATURED FILM (Static or First from DB) ================= */}
+      <section className="w-full px-6 md:px-16 mb-10">
+        {/* Changed max-w-6xl to max-w-5xl to reduce overall size (and height) */}
+        <div className="relative w-full max-w-5xl mx-auto aspect-video bg-black shadow-2xl">
+          {films.length > 0 ? (
+             // Ensure we check both 'video' and 'videoUrl' properties
+             <VideoPlayer url={films[0].video || films[0].videoUrl} title={films[0].title} />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center text-white/50">
+              Loading Featured Film...
+            </div>
+          )}
+
+          {/* Overlay Text (Only show if we have data) */}
+          {films.length > 0 && (
+            <div className="absolute inset-0 flex items-end px-6 md:px-10 pb-10 pointer-events-none">
+              <h1 className="font-serif text-white text-2xl md:text-4xl drop-shadow-lg">
+                {films[0].title}
+              </h1>
+            </div>
+          )}
+        </div>
       </section>
 
       {/* ================= STATEMENT ================= */}
-      <section className="text-center py-24 md:py-32 px-6">
+      <section className="text-center py-16 md:py-24 px-6">
         <h2 className="font-soligant text-4xl md:text-5xl max-w-4xl mx-auto">
           Unforgettable Moments, Timeless Films
         </h2>
@@ -165,7 +170,8 @@ export default function FilmsPage() {
           <div className="text-center text-gray-500">Loading films...</div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-14">
-            {otherFilms.map((film, index) => (
+            {/* Slice the array here in the render, not in useEffect to avoid state issues */}
+            {films.slice(1).map((film, index) => (
               <div key={film.id || index} className="flex flex-col">
                 
                 {/* Video Thumbnail */}

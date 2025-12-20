@@ -122,6 +122,13 @@ export default function PhotographyPage() {
 
         <div className="absolute inset-0 bg-black/20" />
 
+        {/* Centered Title Overlay */}
+        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+          <h1 className="font-soligant text-white text-6xl md:text-9xl tracking-wide drop-shadow-lg">
+            Photography
+          </h1>
+        </div>
+
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-4 z-10">
           {heroImages.map((_, i) => (
             <span
