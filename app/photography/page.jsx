@@ -167,7 +167,8 @@ export default function PhotographyPage() {
 
                 {/* TITLE + LOCATION */}
                 <div className="flex justify-between items-baseline mb-3 border-b border-black/10 pb-3">
-                  <h3 className="font-serif text-2xl group-hover:text-gray-600 transition-colors line-clamp-1">
+                  <h3 className="font-serif text-2xl transition-colors duration-300
+               group-hover:text-gold line-clamp-1">
                     {album.title}
                   </h3>
                   <span className="text-xs uppercase tracking-widest text-gray-500">
