@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { FaInstagram } from "react-icons/fa";
+import { FaInstagram , FaMapMarkerAlt} from "react-icons/fa";
 
 export default function Footer() {
   return (
@@ -37,7 +37,7 @@ export default function Footer() {
 
           <div className="text-center md:text-right flex flex-col items-center md:items-end gap-2">
             <Link
-              href="https://instagram.com"
+              href="https://www.instagram.com/somu.films?igsh=MW55bG55bWRiMW1vYw=="
               target="_blank"
               className="inline-block transition-colors duration-300 hover:text-yellow-600"
             >
@@ -45,8 +45,17 @@ export default function Footer() {
             </Link>
 
             <div className="flex flex-col md:items-end gap-1">
-              <a href="tel:+919737188899" className="hover:text-gray-600 transition-colors">+91 9737188899</a>
+              <a href="tel:+919348037248" className="hover:text-gray-600 transition-colors">+91 9348037248</a>
               <a href="mailto:hello@somufilms.in" className="hover:text-gray-600 transition-colors">hello@somufilms.in</a>
+               {/* LOCATION */}
+  <a
+    href="https://maps.app.goo.gl/QrpscN4xVNQVDPKT6?g_st=aw"
+    target="_blank"
+    className="flex items-center gap-2.5 text-sm md:text-base text-gray-600 hover:text-yellow-600 transition-colors mt-1"
+  >
+    <FaMapMarkerAlt className="text-lg md:text-xl" />
+    Odisha, India
+  </a>
             </div>
           </div>
         </div>

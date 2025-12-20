@@ -87,7 +87,7 @@ export default function ContactUsPage() {
 
       <section className="text-center pb-12 space-y-4">
         <p className="font-serif text-lg">hello@somufilms.in</p>
-        <p className="font-serif text-lg">+91 9737188899</p>
+        <p className="font-serif text-lg">+91 9348037248</p>
         <p className="font-serif text-lg">Surat · Mumbai · Hyderabad</p>
       </section>
 
