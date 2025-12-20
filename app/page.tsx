@@ -313,7 +313,11 @@ export default function HomePage() {
                     )}
                   </div>
 
-                  <h4 className="font-serif text-lg mb-1 group-hover:text-gray-600 transition-colors">
+                  <h4 className="
+    font-serif text-lg mb-1
+    transition-colors duration-300
+    group-hover:text-gold
+  ">
                     {item.title}
                   </h4>
                   <p className="text-muted text-sm uppercase tracking-wide">
@@ -365,7 +369,11 @@ export default function HomePage() {
                 
                 {/* Metadata */}
                 <div className="text-center">
-                  <h4 className="font-serif text-2xl mb-2 group-hover:text-gray-600 transition-colors">
+                  <h4  className="
+    font-serif text-2xl mb-2
+    transition-colors duration-300
+    group-hover:text-gold
+  ">
                     {film.title}
                   </h4>
                   <p className="text-xs uppercase tracking-widest text-gray-500">

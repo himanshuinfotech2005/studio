@@ -89,7 +89,7 @@ export default function Navbar({ white = false }) {
 
             {/* Instagram */}
             <Link
-              href="https://instagram.com"
+              href="https://www.instagram.com/somu.films?igsh=MW55bG55bWRiMW1vYw=="
               target="_blank"
               className={`transition-colors duration-300 -ml-2 ${
                 // Use isTransparent here directly since textColor is now affected by isOpen

@@ -85,7 +85,7 @@ export default function EditorialPage() {
       <Navbar />
 
       {/* ================= INTRO ================= */}
-      <section className="text-center max-w-4xl mx-auto py-32 px-6">
+      <section className="text-center max-w-4xl mx-auto py-32 px-6 mt-15">
         <h1 className="font-serif text-5xl md:text-6xl mb-8">
           Capturing the madness and chaos,
           <br /> we call weddings
