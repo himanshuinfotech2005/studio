@@ -30,7 +30,7 @@ export default function FilmsPage() {
 
       {/* ================= STATEMENT ================= */}
       <section className="text-center py-32 px-6">
-        <h2 className="font-serif text-4xl md:text-5xl max-w-4xl mx-auto">
+        <h2 className="font-soligant text-4xl md:text-5xl max-w-4xl mx-auto">
           Unforgettable Moments, Timeless Films
         </h2>
       </section>

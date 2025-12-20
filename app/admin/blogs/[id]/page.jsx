@@ -127,7 +127,7 @@ export default function AdminEditBlogPage() {
       <BackButton />
       
       <div className="flex justify-between items-center mb-10">
-        <h1 className="font-serif text-4xl">Edit Blog</h1>
+        <h1 className="font-soligant text-4xl">Edit Blog</h1>
         <button onClick={handleDelete} className="text-red-600 text-sm hover:underline">Delete Entry</button>
       </div>
 

@@ -92,7 +92,7 @@ export default function BlogPostPage() {
                     <p className="text-xs font-bold tracking-widest uppercase text-gray-500 mb-4">
                         {formatDate(blog.createdAt)}
                     </p>
-                    <h1 className="font-serif text-4xl md:text-6xl mb-8 leading-tight text-black">
+                    <h1 className="font-soligant text-4xl md:text-6xl mb-8 leading-tight text-black">
                         {blog.title}
                     </h1>
                     <p className="text-xl text-gray-600 italic max-w-2xl mx-auto leading-relaxed">

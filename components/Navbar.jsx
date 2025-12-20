@@ -30,7 +30,6 @@ export default function Navbar({ white = false }) {
     : "bg-transparent";
 
   const navLinks = [
-    { name: "Home", href: "/" },
     { name: "Photography", href: "/photography" },
     { name: "Films", href: "/films" },
     { name: "Editorial", href: "/editorial" },
@@ -49,7 +48,7 @@ export default function Navbar({ white = false }) {
             <Link
               key={link.name}
               href={link.href}
-              className={`text-xs uppercase tracking-widest font-medium transition-colors duration-300 
+              className={`text-[15px] tracking-widest font-medium transition-colors duration-300 
                 ${textColor} hover:text-gold
                 ${pathname === link.href ? "border-b border-current pb-1" : ""}
               `}
@@ -60,10 +59,10 @@ export default function Navbar({ white = false }) {
         </div>
 
         {/* ================= CENTER LOGO ================= */}
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 mt-2">
-          <Link href="/" className="block w-44 h-18 md:w-56 md:h-22">
+        <div className="absolute left-1/2 top-1/2 sm:-translate-x-1/4 -translate-x-1/2 -translate-y-1/2 mt-2">
+          <Link href="/" className="block pl-10 w-44 h-18 md:w-56 md:h-22">
             <Image
-              src="/images/logo/somu.PNG"
+              src={isTransparent ? darkLogo : lightLogo}
               alt="Somu Films"
               fill
               priority
@@ -124,7 +123,7 @@ export default function Navbar({ white = false }) {
             <Link
               key={link.name}
               href={link.href}
-              className="text-2xl font-serif text-black hover:text-gold transition-colors"
+              className="text-4xl font-serif text-black hover:text-gold transition-colors"
             >
               {link.name}
             </Link>

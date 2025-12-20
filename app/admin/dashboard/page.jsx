@@ -34,7 +34,7 @@ export default function AdminDashboard() {
   return (
     <main className="p-16">
       <div className="flex justify-between items-center mb-10">
-        <h1 className="font-serif text-4xl">
+        <h1 className="font-soligant text-4xl">
           Admin Dashboard
         </h1>
         <button 
