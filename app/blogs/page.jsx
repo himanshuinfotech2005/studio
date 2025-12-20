@@ -138,7 +138,7 @@ export default function BlogsPage() {
                     {formatDate(featuredBlog.createdAt)}
                   </p>
 
-                  <h2 className="font-serif text-3xl md:text-[40px] leading-[1.15] mb-6">
+                  <h2 className="font-soligant text-3xl md:text-[40px] leading-[1.15] mb-6">
                     <Link href={`/blogs/${featuredBlog.id}`} className="hover:underline decoration-1 underline-offset-4">
                       {featuredBlog.title}
                     </Link>

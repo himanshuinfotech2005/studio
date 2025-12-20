@@ -89,7 +89,7 @@ export default function FilmsPage() {
         <div className="absolute inset-0 bg-black/30" />
 
         <div className="absolute inset-0 flex items-center justify-center px-6">
-          <h2 className="font-serif text-white text-4xl md:text-5xl text-center max-w-4xl">
+          <h2 className="font-soligant text-white text-4xl md:text-7xl text-center max-w-4xl">
             From deeply rooted cultures and traditions to
             new age modern celebrations, we capture it all!
           </h2>
