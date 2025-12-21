@@ -18,15 +18,21 @@ export default function ContactUsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const handleChange = (e) => {
+  const handleChange = (e, any) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const isMobileDevice = () => {
+    if (typeof window === "undefined") return false;
+    return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  };
+
+  const handleSubmit = async (e, any) => {
     e.preventDefault();
     setSubmitting(true);
 
     try {
+      /* ========= 1️ SAVE TO FIREBASE (UNCHANGED) ========= */
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -36,11 +42,45 @@ export default function ContactUsPage() {
       if (!res.ok) throw new Error("Submission failed");
 
       setSuccess(true);
+
+      /* ========= 2️ PREPARE WHATSAPP MESSAGE ========= */
+      const adminNumber = "916207789974"; // ✅ with country code
+
+      const message = `
+📩 *New Wedding Inquiry*
+
+👤 Name: ${formData.name}
+📞 Phone: ${formData.phone}
+📧 Email: ${formData.email}
+
+📍 Location: ${formData.location}
+📅 Date: ${formData.date || "Not mentioned"}
+🗓 Days: ${formData.days}
+
+📝 Details:
+${formData.details}
+      `;
+
+      const encodedMessage = encodeURIComponent(message);
+
+      const whatsappUrl = isMobileDevice()
+        ? `whatsapp://send?phone=${adminNumber}&text=${encodedMessage}`
+        : `https://web.whatsapp.com/send?phone=${adminNumber}&text=${encodedMessage}`;
+
+      /* ========= 3️ OPEN WHATSAPP ========= */
+      window.open(whatsappUrl, "_blank");
+
+      /* ========= 4️ RESET FORM ========= */
       setFormData({
-        name: "", email: "", phone: "", details: "", location: "", date: "", days: ""
+        name: "",
+        email: "",
+        phone: "",
+        details: "",
+        location: "",
+        date: "",
+        days: "",
       });
-      
-      // Reset success message after 5 seconds
+
       setTimeout(() => setSuccess(false), 5000);
     } catch (error) {
       alert("Something went wrong. Please try again.");
@@ -54,12 +94,12 @@ export default function ContactUsPage() {
 
   return (
     <main className="bg-[#F3ECE2]">
-
       {/* ================= HERO ================= */}
       <section className="relative h-screen w-full overflow-hidden">
         <div className="absolute top-0 left-0 z-50 w-full">
           <Navbar white />
         </div>
+
         <Image
           src="/images/contact/hero.jpg"
           alt="Contact Somu Films"
@@ -69,7 +109,6 @@ export default function ContactUsPage() {
         />
         <div className="absolute inset-0 bg-black/30" />
 
-        {/* Centered Title Overlay */}
         <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
           <h1 className="font-soligant text-white text-6xl md:text-9xl tracking-wide drop-shadow-lg">
             GET QUOTE
@@ -85,10 +124,10 @@ export default function ContactUsPage() {
         </p>
         <p className="text-sm mt-6">
           Please review our{" "}
-          <a href="/faqs" className="underline font-semibold text-black transition-colors duration-300 hover:text-gold">
+          <a href="/faqs" className="underline font-semibold hover:text-gold">
             FAQ
           </a>{" "}
-          section to find answers to common questions.
+          section.
         </p>
       </section>
 
@@ -101,40 +140,40 @@ export default function ContactUsPage() {
       {/* ================= FORM ================= */}
       <section className="min-h-screen flex items-center pb-20">
         <div className="max-w-3xl mx-auto w-full px-6">
-
           {success ? (
             <div className="text-center py-20 bg-green-50 border border-green-200 rounded-lg">
-              <h3 className="text-2xl font-serif text-green-800 mb-2">Thank You!</h3>
-              <p className="text-green-700">We have received your inquiry and will get back to you shortly.</p>
+              <h3 className="text-2xl font-serif text-green-800 mb-2">
+                Thank You!
+              </h3>
+              <p className="text-green-700">
+                We have received your inquiry and will get back to you shortly.
+              </p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-10">
-              <input 
-                name="name" 
-                value={formData.name} 
-                onChange={handleChange} 
-                type="text" 
-                placeholder="Name*" 
-                className={inputClass} 
-                required 
+              <input
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Name*"
+                className={inputClass}
+                required
               />
 
-              <input 
-                name="email" 
-                value={formData.email} 
-                onChange={handleChange} 
-                type="email" 
-                placeholder="Email*" 
-                className={inputClass} 
-                required 
+              <input
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Email*"
+                className={inputClass}
+                required
               />
 
               <input
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                type="text"
-                placeholder="+91 ▾  Whatsapp No.*"
+                placeholder="WhatsApp No.*"
                 className={inputClass}
                 required
               />
@@ -143,8 +182,8 @@ export default function ContactUsPage() {
                 name="details"
                 value={formData.details}
                 onChange={handleChange}
-                placeholder="Tell us more about your wedding – event flow, venues.*"
-                rows="3"
+                placeholder="Wedding details*"
+                rows={3}
                 className={`${inputClass} resize-none`}
                 required
               />
@@ -153,25 +192,23 @@ export default function ContactUsPage() {
                 name="location"
                 value={formData.location}
                 onChange={handleChange}
-                type="text"
-                placeholder="Location of the wedding*"
+                placeholder="Location*"
                 className={inputClass}
                 required
               />
 
               <div className="grid grid-cols-2 gap-12">
-                <input 
-                  name="date" 
-                  value={formData.date} 
-                  onChange={handleChange} 
-                  type="date" 
-                  className={inputClass} 
+                <input
+                  type="date"
+                  name="date"
+                  value={formData.date}
+                  onChange={handleChange}
+                  className={inputClass}
                 />
                 <input
                   name="days"
                   value={formData.days}
                   onChange={handleChange}
-                  type="number"
                   placeholder="No. of Days*"
                   className={inputClass}
                   required
@@ -182,14 +219,13 @@ export default function ContactUsPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="bg-[#C5A059] text-white px-12 py-3 rounded-md text-sm tracking-wide hover:bg-[#b08d4b] transition-colors disabled:opacity-50"
+                  className="bg-[#C5A059] text-white px-12 py-3 rounded-md text-sm tracking-wide hover:bg-[#b08d4b] disabled:opacity-50"
                 >
                   {submitting ? "SENDING..." : "SUBMIT"}
                 </button>
               </div>
             </form>
           )}
-
         </div>
       </section>
     </main>

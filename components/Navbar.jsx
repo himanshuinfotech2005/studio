@@ -1,11 +1,11 @@
 "use client";
-import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
-import lightLogo from "../public/light.png";
-import darkLogo from "../public/images/logo/somu.png";
+import { useEffect, useState } from "react";
 import { FaInstagram } from "react-icons/fa";
+import darkLogo from "../public/images/logo/somu.png";
+import lightLogo from "../public/light.png";
 
 export default function Navbar({ white = false }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -56,7 +56,7 @@ export default function Navbar({ white = false }) {
         <div className="relative h-32 px-10 md:px-16 flex items-center pt-5">
 
           {/* ================= LEFT LINKS ================= */}
-          <div className="hidden md:flex flex-1 items-center gap-6 justify-start -ml-5">
+          <div className="hidden lg:flex flex-1 items-center gap-6 justify-start -ml-5">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
